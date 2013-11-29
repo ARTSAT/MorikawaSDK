@@ -1,0 +1,23 @@
+# beerware, SparkFun Electronics 2011
+# This file adds the Mega Pro 3.3V board to Arduino device list
+# compatible with the Mega Pro 3.3V  and Mega Pro Mini 3.3V
+
+###################################################################
+mega2560v.name=Mega Pro 2560V 3.3V
+
+mega2560v.upload.protocol=stk500v2
+mega2560v.upload.maximum_size=258048
+mega2560v.upload.speed=57600
+
+mega2560v.bootloader.low_fuses=0xE2
+mega2560v.bootloader.high_fuses=0xD4
+mega2560v.bootloader.extended_fuses=0xFD
+mega2560v.bootloader.path=
+mega2560v.bootloader.file=MegaPro3.3V-8MHz-57600.hex
+mega2560v.bootloader.lock_bits=0xCF	
+
+mega2560v.build.mcu=atmega2560
+mega2560v.build.f_cpu=8000000L
+mega2560v.build.core=arduino
+mega2560v.build.variant=mega
+###################################################################
