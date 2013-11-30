@@ -5,7 +5,7 @@ An arduino base application programming environment for satellite's mission.<br/
 <br/>
 currently supported APIs:<br/>
 <br/>
-static  TSTMorikawa&        getInstance             (void);<br/>
+static&nbsp&nbspTSTMorikawa&        getInstance             (void);<br/>
 static  TSTError            getMemorySpec           (MemorySpec* result);<br/>
 static  TSTError            getMemoryInfo           (MemoryInfo* result);<br/>
 static  TSTError            getMemoryLog            (MemoryInfo* result);<br/>
