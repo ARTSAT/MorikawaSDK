@@ -1,0 +1,3 @@
+If you want to use MainBoard simulator, please see
+
+https://github.com/ARTSAT/ground_station/tree/master/openFrameworks-osx/MainBoardSimulator
