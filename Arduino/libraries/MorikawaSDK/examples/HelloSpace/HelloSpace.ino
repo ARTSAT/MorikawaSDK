@@ -44,9 +44,6 @@
 
 #include <MorikawaSDK.h>
 
-static char const g_morse[] PROGMEM = "hello space";
-static char const g_speak[] PROGMEM = "konnnichi'wa uchu-";
-
 void setup(void)
 {
     if (Morikawa.setup() == TSTERROR_OK) {
@@ -66,11 +63,11 @@ void loop(void)
     Morikawa.loop();
     
     // use morse player
-    Morikawa.playMorsePGM(NOTE_C6, g_morse);
+    Morikawa.playMorsePGM(NOTE_C6, PSTR("hello space"));
     delay(1000);
     
     // use voice speaker
-    Morikawa.speakPhrasePGM(g_speak);
+    Morikawa.speakPhrasePGM(PSTR("konnnichi'wa uchu-"));
     delay(1000);
     return;
 }
