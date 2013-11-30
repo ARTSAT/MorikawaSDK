@@ -1,9 +1,8 @@
 MorikawaSDK
 ===========
 
-An arduino base application programming environment for satellite's mission.
-===========
-
+An arduino base application programming environment for satellite's mission.<br/>
+<br/>
 currently supported APIs:<br/>
 <br/>
 // singleton design<br/>
