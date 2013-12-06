@@ -125,6 +125,10 @@ TSTError speakPhrasePGM(char const PROGMEM* phrase, int length = -1);<br/>
 TSTError waitPhrase(void);<br/>
 TSTError stopPhrase(void);<br/>
 <br/>
+// data compression / decompression<br/>
+TSTError freezeFastLZ(StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, StorageType wstorage, unsigned long waddress, unsigned long wsize, unsigned long* result);<br/>
+TSTError meltFastLZ(StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, unsigned long* result);<br/>
+<br/>
 // audio power control<br/>
 TSTError enableAudioBus(void);<br/>
 void disableAudioBus(void);<br/>
