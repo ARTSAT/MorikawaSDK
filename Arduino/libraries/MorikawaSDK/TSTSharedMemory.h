@@ -46,6 +46,7 @@
 #define __TST_SHAREDMEMORY_H
 
 #include "TSTType.h"
+#include "TSTTrinity.h"
 
 namespace tst {
 
@@ -86,7 +87,8 @@ class TSTSharedMemory {
         };
     
     private:
-                TSTMorikawa*        _morikawa;
+                TSTTrinity<TSTMorikawa*>
+                                    _morikawa;
     
     public:
         static  unsigned long       getSize                 (void);

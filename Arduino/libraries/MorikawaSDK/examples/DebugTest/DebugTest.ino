@@ -1772,6 +1772,76 @@ void setup(void)
             }
             post(error);
         }
+        {
+            static char const g_string[] PROGMEM = "This is MorikawaSDK. MorikawaSDK supports FastLZ data compression algorithm...MorikawaSDK MorikawaSDK MorikawaSDK";
+            unsigned long output;
+            
+            // freezeFastLZ()
+            {
+                unsigned long work;
+                
+                Morikawa.writeSharedMemoryPGM(0, g_string, lengthof(g_string));
+                pre("freezeFastLZ");
+                error = Morikawa.freezeFastLZ(STORAGE_NONE, 0, 0, STORAGE_NONE, 0, 0, STORAGE_NONE, 0, 0, &output);
+                if (error == TSTERROR_INVALID_STORAGE) {
+                    error = Morikawa.freezeFastLZ(STORAGE_SHAREDMEMORY, 0, lengthof(g_string), STORAGE_NONE, 0, 0, STORAGE_NONE, 0, 0, NULL);
+                    if (error == TSTERROR_INVALID_PARAM) {
+                        error = Morikawa.freezeFastLZ(STORAGE_SHAREDMEMORY, 0, lengthof(g_string), STORAGE_NONE, 0, 0, STORAGE_FRAM, 0, 0, NULL);
+                        if (error == TSTERROR_INVALID_PARAM) {
+                            error = Morikawa.freezeFastLZ(STORAGE_SHAREDMEMORY, 0, lengthof(g_string), STORAGE_FRAM, 0, 0, STORAGE_NONE, 0, 0, NULL);
+                            if (error == TSTERROR_INVALID_PARAM) {
+                                error = Morikawa.freezeFastLZ(STORAGE_SHAREDMEMORY, 0, lengthof(g_string), STORAGE_FRAM, 0, 0, STORAGE_FRAM, 0, 0, NULL);
+                                if (error == TSTERROR_INVALID_PARAM) {
+                                    error = Morikawa.freezeFastLZ(STORAGE_SHAREDMEMORY, 0, lengthof(g_string), STORAGE_NONE, 0, 0, STORAGE_NONE, 0, 0, &output);
+                                    if (error == TSTERROR_OK) {
+                                        error = Morikawa.freezeFastLZ(STORAGE_SHAREDMEMORY, 0, lengthof(g_string), STORAGE_FRAM, 0, output, STORAGE_NONE, 0, 0, &work);
+                                        if (error == TSTERROR_OK) {
+                                            error = Morikawa.freezeFastLZ(STORAGE_SHAREDMEMORY, 0, lengthof(g_string), STORAGE_FRAM, 0, output, STORAGE_FRAM, output - 1, work, &output);
+                                            if (error == TSTERROR_INVALID_PARAM) {
+                                                error = Morikawa.freezeFastLZ(STORAGE_FRAM, 0, lengthof(g_string), STORAGE_FRAM, 0, output, STORAGE_FRAM, output, work, &output);
+                                                if (error == TSTERROR_INVALID_PARAM) {
+                                                    error = Morikawa.freezeFastLZ(STORAGE_SHAREDMEMORY, 0, lengthof(g_string), STORAGE_FRAM, 0, output, STORAGE_FRAM, output, work, &output);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                post(error);
+            }
+            // meltFastLZ()
+            {
+                char temp[256];
+                
+                pre("meltFastLZ");
+                error = Morikawa.meltFastLZ(STORAGE_NONE, 0, 0, STORAGE_NONE, 0, 0, &output);
+                if (error == TSTERROR_INVALID_STORAGE) {
+                    error = Morikawa.meltFastLZ(STORAGE_FRAM, 0, 0, STORAGE_NONE, 0, 0, &output);
+                    if (error == TSTERROR_INVALID_STORAGE) {
+                        error = Morikawa.meltFastLZ(STORAGE_NONE, 0, 0, STORAGE_FRAM, 0, 0, &output);
+                        if (error == TSTERROR_INVALID_STORAGE) {
+                            error = Morikawa.meltFastLZ(STORAGE_FRAM, 0, output, STORAGE_SHAREDMEMORY, 512, lengthof(g_string), NULL);
+                            if (error == TSTERROR_INVALID_PARAM) {
+                                error = Morikawa.meltFastLZ(STORAGE_FRAM, 0, output, STORAGE_FRAM, output - 1, lengthof(g_string), &output);
+                                if (error == TSTERROR_INVALID_PARAM) {
+                                    error = Morikawa.meltFastLZ(STORAGE_FRAM, 0, output, STORAGE_SHAREDMEMORY, 512, lengthof(g_string), &output);
+                                    if (error == TSTERROR_INVALID_STORAGE) {
+                                        Morikawa.readSharedMemory(512, temp, output);
+                                        if (strcmp_P(temp, g_string) != 0) {
+                                            error = TSTERROR_FAILED;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                post(error);
+            }
+        }
         // enableAudioBus()
         {
             pre("enableAudioBus");

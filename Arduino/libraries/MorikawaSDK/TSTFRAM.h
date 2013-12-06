@@ -48,13 +48,15 @@
 #define __TST_FRAM_H
 
 #include "TSTType.h"
+#include "TSTTrinity.h"
 
 namespace tst {
 
 class TSTMorikawa;
 class TSTFRAM {
     private:
-                TSTMorikawa*        _morikawa;
+                TSTTrinity<TSTMorikawa*>
+                                    _morikawa;
     
     public:
         static  unsigned long       getSize                 (void);

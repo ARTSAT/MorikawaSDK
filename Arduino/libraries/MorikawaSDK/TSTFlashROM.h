@@ -46,14 +46,16 @@
 #define __TST_FLASHROM_H
 
 #include "TSTType.h"
+#include "TSTTrinity.h"
 
 namespace tst {
 
 class TSTMorikawa;
 class TSTFlashROM {
     private:
-                TSTMorikawa*        _morikawa;
-                bool                _erase;
+                TSTTrinity<TSTMorikawa*>
+                                    _morikawa;
+                TSTTrinity<bool>    _erase;
     
     public:
         static  unsigned long       getSize                 (void);

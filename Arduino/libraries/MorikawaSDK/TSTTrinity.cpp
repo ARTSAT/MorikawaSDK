@@ -1,16 +1,7 @@
 /*
 **      ARTSAT MorikawaSDK
 **
-**      Original Copyright (C) 2012 - 2012 HORIGUCHI Junshi.
-**                                          http://iridium.jp/
-**                                          zap00365@nifty.com
-**      Portions Copyright (C) 2012 - 2012 OZAKI Naoya.
-**                                          naoya.ozaki11@gmail.com
-**      Portions Copyright (C) 2012 - 2013 SHINTANI Kodai.
-**                                          shinkoko43@gmail.com
-**      Portions Copyright (C) 2012 - 2013 TOKITAKE Yuta.
-**                                          toki211@gmail.com
-**      Portions Copyright (C) 2013 - 2013 HORIGUCHI Junshi.
+**      Original Copyright (C) 2013 - 2013 HORIGUCHI Junshi.
 **                                          http://iridium.jp/
 **                                          zap00365@nifty.com
 **      Portions Copyright (C) <year> <author>
@@ -25,7 +16,7 @@
 **      This source code is for Arduino IDE.
 **      Arduino 1.0.5
 **
-**      TSTType.h
+**      TSTTrinity.cpp
 **
 **      ------------------------------------------------------------------------
 **
@@ -51,56 +42,8 @@
 **      もし受け取っていなければ <http://www.gnu.org/licenses/> をご覧ください。
 */
 
-#ifndef __TST_TYPE_H
-#define __TST_TYPE_H
-
-#include <avr/pgmspace.h>
-#include <avr/sleep.h>
-#include <stddef.h>
-#include <Arduino.h>
-
-#define TARGET_MORIKAWA_FM1
-#define OPTION_BUILD_MEMORYLOG
+#include "TSTTrinity.h"
 
 namespace tst {
 
-#define lengthof(param)     (sizeof(param) / sizeof(param[0]))
-#define asciiesof(param)    (lengthof(param) - 1)
-
-#define EEPROM_LIMIT        (0x1000)
-#define EEPROM_SELFTEST     (0x0F00)
-#define EEPROM_FLASHROM     (0x0B00)
-
-enum PinEnum {
-    PIN_FRAM_CS             = 10,
-    PIN_FLASHROM_CS         = 11,
-    PIN_LED_X               = 5,
-    PIN_LED_Y               = 2,
-    PIN_TONE_WAVE           = 3,
-    PIN_DIGITALKER_PLAY     = 26,
-    PIN_DIGITALKER_SLEEP    = 27,
-    PIN_CAMERA_POWER        = 29,
-    PIN_CAMERA_VSYNC        = 49,
-    PIN_CAMERA_HREF         = 48,
-    PIN_CAMERA_WEN          = 47,
-    PIN_CAMERA_RRST         = 46,
-    PIN_CAMERA_OE           = 45,
-    PIN_CAMERA_RCLK         = 44,
-    PIN_SCCB_SIOC           = 43,
-    PIN_SCCB_SIOD           = 42
-};
-typedef unsigned char       PinType;
-enum StorageEnum {
-    STORAGE_NONE,
-    STORAGE_SHAREDMEMORY,
-    STORAGE_FRAM,
-    STORAGE_FLASHROM,
-    STORAGE_LIMIT
-};
-typedef unsigned char       StorageType;
-
 }// end of namespace
-
-#include "TSTError.h"
-
-#endif

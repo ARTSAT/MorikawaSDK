@@ -48,14 +48,16 @@
 #define __TST_DIGITALKER_H
 
 #include "TSTType.h"
+#include "TSTTrinity.h"
 
 namespace tst {
 
 class TSTMorikawa;
 class TSTDigitalker {
     private:
-                TSTMorikawa*        _morikawa;
-                bool                _wake;
+                TSTTrinity<TSTMorikawa*>
+                                    _morikawa;
+                TSTTrinity<bool>    _wake;
                 bool                _async;
     
     public:

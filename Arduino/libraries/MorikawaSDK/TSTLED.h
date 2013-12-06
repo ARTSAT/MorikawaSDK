@@ -46,6 +46,7 @@
 #define __TST_LED_H
 
 #include "TSTType.h"
+#include "TSTTrinity.h"
 
 namespace tst {
 
@@ -59,7 +60,8 @@ typedef unsigned char       LEDType;
 class TSTMorikawa;
 class TSTLED {
     private:
-                TSTMorikawa*        _morikawa;
+                TSTTrinity<TSTMorikawa*>
+                                    _morikawa;
                 unsigned char       _pwm[LED_LIMIT];
     
     public:

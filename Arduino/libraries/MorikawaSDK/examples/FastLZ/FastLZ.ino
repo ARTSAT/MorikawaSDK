@@ -16,7 +16,7 @@
 **      This source code is for Arduino IDE.
 **      Arduino 1.0.5
 **
-**      TSTCamera.h
+**      FastLZ.ino
 **
 **      ------------------------------------------------------------------------
 **
@@ -42,75 +42,77 @@
 **      もし受け取っていなければ <http://www.gnu.org/licenses/> をご覧ください。
 */
 
-#ifndef __TST_CAMERA_H
-#define __TST_CAMERA_H
+#include <MorikawaSDK.h>
 
-#include "TSTType.h"
-#include "TSTTrinity.h"
+static char const g_string[] PROGMEM = "This is MorikawaSDK. MorikawaSDK supports FastLZ data compression algorithm...MorikawaSDK MorikawaSDK MorikawaSDK";
 
-namespace tst {
-
-enum CameraEnum {
-    CAMERA_RGB565_QVGA,
-    CAMERA_RGB565_QQVGA,
-    CAMERA_RGB565_QQCIF,
-    CAMERA_YUV422_QVGA,
-    CAMERA_YUV422_QQVGA,
-    CAMERA_YUV422_QQCIF,
-    CAMERA_RAW_VGA,
-    CAMERA_RAW_QVGA,
-    CAMERA_RAW_QCIF,
-    CAMERA_LIMIT
-};
-typedef unsigned char       CameraType;
-
-struct CameraFormat {
-    unsigned char           width;
-    unsigned char           height;
-    unsigned char           depth;
-};
-class TSTMorikawa;
-class TSTCamera {
-    private:
-        struct RegisterRec {
-            unsigned char           address;
-            unsigned char           value;
-        };
+void setup(void)
+{
+    if (Morikawa.setup() == TSTERROR_OK) {
     
-    private:
-                TSTTrinity<TSTMorikawa*>
-                                    _morikawa;
+        // use debug serial
+        Serial.begin(9600);
+    }
+    else {
+        Morikawa.shutdown();
+    }
+    return;
+}
+
+void loop(void)
+{
+    unsigned long output;
+    unsigned long work;
+    char temp[256];
+    TSTError error;
     
-    public:
-        static  TSTError            getFormat               (CameraType mode, CameraFormat* result);
-                bool                isValid                 (void) const;
-                TSTError            setup                   (TSTMorikawa* morikawa);
-                void                cleanup                 (void);
-                TSTError            snapshot                (CameraType mode, StorageType storage, unsigned long address, unsigned long size, unsigned long* result = NULL);
-    private:
-        explicit                    TSTCamera               (void);
-                                    ~TSTCamera              (void);
-                TSTError            transfer                (RegisterRec const PROGMEM* data, unsigned int size);
-    private:
-                                    TSTCamera               (TSTCamera const&);
-                TSTCamera&          operator=               (TSTCamera const&);
-    friend      class               TSTMorikawa;
-};
-
-/*private */inline TSTCamera::TSTCamera(void) : _morikawa(NULL)
-{
+    Morikawa.loop();
+    
+    Serial.print("original size = ");
+    Serial.println(lengthof(g_string));
+    
+    // write data to shared memory
+    Morikawa.writeSharedMemoryPGM(0, g_string, lengthof(g_string));
+    
+    // get recommend output buffer size
+    error = Morikawa.freezeFastLZ(STORAGE_SHAREDMEMORY, 0, lengthof(g_string), STORAGE_NONE, 0, 0, STORAGE_NONE, 0, 0, &output);
+    Serial.print("recommend output buffer size = ");
+    Serial.print(output);
+    Serial.print(", error = ");
+    Serial.println(error);
+    
+    // get recommend work buffer size
+    error = Morikawa.freezeFastLZ(STORAGE_SHAREDMEMORY, 0, lengthof(g_string), STORAGE_FRAM, 0, output, STORAGE_NONE, 0, 0, &work);
+    Serial.print("recommend work buffer size = ");
+    Serial.print(work);
+    Serial.print(", error = ");
+    Serial.println(error);
+    
+    // compress data from shared memory to FRAM
+    error = Morikawa.freezeFastLZ(STORAGE_SHAREDMEMORY, 0, lengthof(g_string), STORAGE_FRAM, 0, output, STORAGE_FRAM, output, work, &output);
+    Serial.print("compressed size = ");
+    Serial.print(output);
+    Serial.print(", error = ");
+    Serial.println(error);
+    
+    // decompress data from FRAM to shared memory
+    error = Morikawa.meltFastLZ(STORAGE_FRAM, 0, output, STORAGE_SHAREDMEMORY, 512, lengthof(g_string), &output);
+    Serial.print("decompressed size = ");
+    Serial.print(output);
+    Serial.print(", error = ");
+    Serial.println(error);
+    
+    // read data from shared memory
+    Morikawa.readSharedMemory(512, temp, output);
+    
+    // compare read data with original data
+    if (strcmp_P(temp, g_string) == 0) {
+        Serial.println("OK");
+    }
+    else {
+        Serial.println("NG");
+    }
+    Serial.end();
+    Morikawa.shutdown();
+    return;
 }
-
-/*private */inline TSTCamera::~TSTCamera(void)
-{
-    cleanup();
-}
-
-/*public */inline bool TSTCamera::isValid(void) const
-{
-    return (_morikawa != NULL);
-}
-
-}// end of namespace
-
-#endif

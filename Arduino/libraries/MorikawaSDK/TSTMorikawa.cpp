@@ -56,6 +56,7 @@
 #include "EEPROM.h"
 #include "I2Cm.h"
 #include "SPI.h"
+#include "fastlz.h"
 #include "TSTCriticalSection.h"
 
 extern "C" {
@@ -100,7 +101,7 @@ static char const g_delimiter[] PROGMEM = PACKET_DELIMITER;
 MemoryInfo TSTMorikawa::_memory = {
     0, RAMEND + 1, 0, RAMEND + 1
 };
-bool TSTMorikawa::_selftest(false);
+TSTTrinity<bool> TSTMorikawa::_selftest(false);
 
 /*public static */TSTMorikawa& TSTMorikawa::getInstance(void)
 {
@@ -661,6 +662,61 @@ bool TSTMorikawa::_selftest(false);
     return error;
 }
 
+/*public */TSTError TSTMorikawa::freezeFastLZ(StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, StorageType wstorage, unsigned long waddress, unsigned long wsize, unsigned long* result)
+{
+    unsigned long size;
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    if ((error = checkFastLZ(istorage, iaddress, isize, ostorage, oaddress, osize, wstorage, waddress, wsize, result)) == TSTERROR_OK) {
+        if (ostorage == STORAGE_NONE) {
+            *result = isize * 105 / 100;
+        }
+        else if (wstorage == STORAGE_NONE) {
+            *result = 32768;
+        }
+        else if (isize >= 16 && (osize >= 66 && osize >= isize * 105 / 100) && wsize >= 32768) {
+            size = fastlz_compress(this, istorage, iaddress, isize, ostorage, oaddress, wstorage, waddress, &error);
+            if (error == TSTERROR_OK) {
+                *result = size;
+            }
+        }
+        else {
+            error = TSTERROR_INVALID_PARAM;
+        }
+    }
+    return error;
+}
+
+/*public */TSTError TSTMorikawa::meltFastLZ(StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, unsigned long* result)
+{
+    unsigned long size;
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    if ((error = checkFastLZ(istorage, iaddress, isize, ostorage, oaddress, osize, STORAGE_NONE, 0, 0, result)) == TSTERROR_OK) {
+        if (ostorage != STORAGE_NONE) {
+            size = fastlz_decompress(this, istorage, iaddress, isize, ostorage, oaddress, osize, &error);
+            if (error == TSTERROR_OK) {
+                if (size > 0) {
+                    *result = size;
+                }
+                else {
+                    error = TSTERROR_FAILED;
+                }
+            }
+        }
+        else {
+            error = TSTERROR_INVALID_STORAGE;
+        }
+    }
+    return error;
+}
+
 /*public */TSTError TSTMorikawa::enableAudioBus(void)
 {
     TSTError log;
@@ -897,6 +953,93 @@ bool TSTMorikawa::_selftest(false);
     return error;
 }
 
+/*private */TSTError TSTMorikawa::checkFastLZ(StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, StorageType wstorage, unsigned long waddress, unsigned long wsize, unsigned long* result) const
+{
+    static unsigned long (*const getSize[STORAGE_LIMIT])(void) = {
+        NULL, &getSizeSharedMemory, &getSizeFRAM, &getSizeFlashROM
+    };
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    switch (istorage) {
+        case STORAGE_SHAREDMEMORY:
+        case STORAGE_FRAM:
+        case STORAGE_FLASHROM:
+            if (iaddress + isize <= (*getSize[istorage])()) {
+                switch (ostorage) {
+                    case STORAGE_NONE:
+                        // nop
+                        break;
+                    case STORAGE_SHAREDMEMORY:
+                    case STORAGE_FRAM:
+                        if (oaddress + osize <= (*getSize[ostorage])()) {
+                            if (istorage == ostorage) {
+                                if (oaddress < iaddress + isize && iaddress < oaddress + osize) {
+                                    error = TSTERROR_INVALID_PARAM;
+                                }
+                            }
+                            if (error == TSTERROR_OK) {
+                                switch (wstorage) {
+                                    case STORAGE_NONE:
+                                        // nop
+                                        break;
+                                    case STORAGE_FRAM:
+                                        if (waddress + wsize <= (*getSize[wstorage])()) {
+                                            if (ostorage == wstorage) {
+                                                if (waddress < oaddress + osize && oaddress < waddress + wsize) {
+                                                    error = TSTERROR_INVALID_PARAM;
+                                                }
+                                            }
+                                            if (error == TSTERROR_OK) {
+                                                if (wstorage == istorage) {
+                                                    if (iaddress < waddress + wsize && waddress < iaddress + isize) {
+                                                        error = TSTERROR_INVALID_PARAM;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            error = TSTERROR_INVALID_PARAM;
+                                        }
+                                        break;
+                                    default:
+                                        error = TSTERROR_INVALID_STORAGE;
+                                        break;
+                                }
+                            }
+                        }
+                        else {
+                            error = TSTERROR_INVALID_PARAM;
+                        }
+                        break;
+                    default:
+                        error = TSTERROR_INVALID_STORAGE;
+                        break;
+                }
+                if (error == TSTERROR_OK) {
+                    if (result != NULL) {
+                        if (!_state) {
+                            error = TSTERROR_INVALID_STATE;
+                        }
+                    }
+                    else {
+                        error = TSTERROR_INVALID_PARAM;
+                    }
+                }
+            }
+            else {
+                error = TSTERROR_INVALID_PARAM;
+            }
+            break;
+        default:
+            error = TSTERROR_INVALID_STORAGE;
+            break;
+    }
+    return error;
+}
+
 /*private static */TSTError TSTMorikawa::sendRequest(char to, char const PROGMEM* command)
 {
 #ifdef OPTION_BUILD_MEMORYLOG
@@ -948,10 +1091,10 @@ bool TSTMorikawa::_selftest(false);
     }
     if (i >= asciiesof(g_send)) {
         memcpy_P(&buffer[i], g_delimiter, lengthof(g_delimiter));
-        timer1 = TIMSK1 & _BV(TOIE1);
+        timer1 = TIMSK1;
         TIMSK1 &= ~_BV(TOIE1);
         Serial1.print(buffer);
-        TIMSK1 |= timer1;
+        TIMSK1 = timer1;
     }
     else {
         error = TSTERROR_FAILED;
@@ -963,11 +1106,14 @@ bool TSTMorikawa::_selftest(false);
 {
     unsigned char timer1;
     unsigned char usart1;
+    unsigned char i2cm;
     
-    timer1 = TIMSK1 & _BV(TOIE1);
+    timer1 = TIMSK1;
     TIMSK1 &= ~_BV(TOIE1);
-    usart1 = UCSR1B & _BV(RXCIE1);
+    usart1 = UCSR1B;
     UCSR1B &= ~_BV(RXCIE1);
+    i2cm = TWCR;
+    TWCR &= ~(_BV(TWIE) | _BV(TWINT));
     sei();
     
 #ifdef OPTION_BUILD_MEMORYLOG
@@ -975,8 +1121,10 @@ bool TSTMorikawa::_selftest(false);
 #endif
     getInstance().onReceivePacket();
     
-    UCSR1B |= usart1;
-    TIMSK1 |= timer1;
+    cli();
+    TWCR = i2cm & ~_BV(TWINT);
+    UCSR1B = usart1;
+    TIMSK1 = timer1;
     return;
 }
 

@@ -265,16 +265,17 @@ class TSTMorikawa {
     
     private:
         static  MemoryInfo          _memory;
-        static  bool                _selftest;
-                bool                _state;
-                unsigned int        _index;
-                bool                _overflow;
+        static  TSTTrinity<bool>    _selftest;
+                TSTTrinity<bool>    _state;
+                TSTTrinity<unsigned int>
+                                    _index;
+                TSTTrinity<bool>    _overflow;
                 unsigned char       _buffer[80];
-                bool                _page;
-                bool                _update;
+                TSTTrinity<bool>    _page;
+                TSTTrinity<bool>    _update;
                 unsigned char       _telemetry[2][TELEMETRY_LIMIT];
-                bool                _shutdown;
-                bool                _audio;
+                TSTTrinity<bool>    _shutdown;
+                TSTTrinity<bool>    _audio;
                 TSTSharedMemory::BootParamRec
                                     _param;
                 TSTSharedMemory     _shared;
@@ -366,6 +367,8 @@ class TSTMorikawa {
                 TSTError            speakPhrasePGM          (char const PROGMEM* phrase, int length = -1);
                 TSTError            waitPhrase              (void);
                 TSTError            stopPhrase              (void);
+                TSTError            freezeFastLZ            (StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, StorageType wstorage, unsigned long waddress, unsigned long wsize, unsigned long* result);
+                TSTError            meltFastLZ              (StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, unsigned long* result);
                 TSTError            enableAudioBus          (void);
                 void                disableAudioBus         (void);
     private:
@@ -378,6 +381,7 @@ class TSTMorikawa {
                 void                shareSelfTestLog        (void);
                 TSTError            convertTelemetry        (RuleRec const PROGMEM& rule, void* result) const;
         static  TSTError            checkEEPROM             (unsigned long address, void const* data, unsigned int* size, unsigned int* result);
+                TSTError            checkFastLZ             (StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, StorageType wstorage, unsigned long waddress, unsigned long wsize, unsigned long* result) const;
         static  TSTError            sendRequest             (char to, char const PROGMEM* command);
         static  TSTError            sendResponse            (char to, char const PROGMEM* command);
         static  TSTError            sendPacket              (char mode, char to, char const PROGMEM* command);

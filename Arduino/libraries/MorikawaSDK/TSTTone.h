@@ -48,6 +48,7 @@
 #define __TST_TONE_H
 
 #include "TSTType.h"
+#include "TSTTrinity.h"
 
 namespace tst {
 
@@ -175,9 +176,10 @@ struct NoteSequence {
 class TSTMorikawa;
 class TSTTone {
     private:
-                TSTMorikawa*        _morikawa;
-                int                 _bpm;
-                int                 _wpm;
+                TSTTrinity<TSTMorikawa*>
+                                    _morikawa;
+                TSTTrinity<int>     _bpm;
+                TSTTrinity<int>     _wpm;
     
     public:
                 TSTError            setNoteBPM              (int param = -1);
