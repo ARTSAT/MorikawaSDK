@@ -87,6 +87,14 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     return PAGE_SIZE;
 }
 
+/*public static */unsigned long TSTSharedMemory::getSectorSize(void)
+{
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    return 0;
+}
+
 /*public */TSTError TSTSharedMemory::setup(TSTMorikawa* morikawa)
 {
     TSTError error(TSTERROR_OK);

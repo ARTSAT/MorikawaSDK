@@ -55,13 +55,13 @@ class TSTCriticalSection {
                 unsigned char       _sreg;
     
     public:
-        explicit                    TSTCriticalSection      (void);
-                                    ~TSTCriticalSection     (void);
-                void                lock                    (void);
-                void                unlock                  (void);
+        explicit                    TSTCriticalSection          (void);
+                                    ~TSTCriticalSection         (void);
+                void                lock                        (void);
+                void                unlock                      (void);
     private:
-                                    TSTCriticalSection      (TSTCriticalSection const&);
-                TSTCriticalSection& operator=               (TSTCriticalSection const&);
+                                    TSTCriticalSection          (TSTCriticalSection const&);
+                TSTCriticalSection& operator=                   (TSTCriticalSection const&);
 };
 
 /*public */inline TSTCriticalSection::TSTCriticalSection(void) : _state(false)

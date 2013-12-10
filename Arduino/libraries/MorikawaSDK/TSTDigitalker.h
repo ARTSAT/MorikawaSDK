@@ -61,26 +61,26 @@ class TSTDigitalker {
                 bool                _async;
     
     public:
-                TSTError            setAsyncMode            (bool param);
-                bool                getAsyncMode            (void) const;
-                bool                isValid                 (void) const;
-                TSTError            isBusy                  (bool* result) const;
-                TSTError            setup                   (TSTMorikawa* morikawa);
-                void                cleanup                 (void);
-                void                loop                    (void);
-                TSTError            speakPhrase             (char const* phrase, int length = -1);
-                TSTError            speakPhrasePGM          (char const PROGMEM* phrase, int length = -1);
-                TSTError            waitPhrase              (void);
-                TSTError            stopPhrase              (void);
+                TSTError            setAsyncMode                (bool param);
+                bool                getAsyncMode                (void) const;
+                bool                isValid                     (void) const;
+                TSTError            isBusy                      (bool* result) const;
+                TSTError            setup                       (TSTMorikawa* morikawa);
+                void                cleanup                     (void);
+                void                loop                        (void);
+                TSTError            speakPhrase                 (char const* phrase, int length = -1);
+                TSTError            speakPhrasePGM              (char const PROGMEM* phrase, int length = -1);
+                TSTError            waitPhrase                  (void);
+                TSTError            stopPhrase                  (void);
     private:
-        explicit                    TSTDigitalker           (void);
-                                    ~TSTDigitalker          (void);
-                TSTError            speakPhrase             (char const* ram, char const PROGMEM* rom, int length);
-                void                wake                    (void);
-                void                sleep                   (void);
+        explicit                    TSTDigitalker               (void);
+                                    ~TSTDigitalker              (void);
+                TSTError            speakPhrase                 (char const* ram, char const PROGMEM* rom, int length);
+                void                wake                        (void);
+                void                sleep                       (void);
     private:
-                                    TSTDigitalker           (TSTDigitalker const&);
-                TSTDigitalker&      operator=               (TSTDigitalker const&);
+                                    TSTDigitalker               (TSTDigitalker const&);
+                TSTDigitalker&      operator=                   (TSTDigitalker const&);
     friend      class               TSTMorikawa;
 };
 

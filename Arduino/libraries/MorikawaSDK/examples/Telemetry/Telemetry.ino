@@ -60,15 +60,35 @@ void setup(void)
 void loop(void)
 {
     unsigned long obcTime;
+    unsigned char raw;
+    double value;
     
     Morikawa.loop();
     
-    // get OBC time
-    Morikawa.getTelemetryTime(TIME_OBCTIME, &obcTime);
-    
-    Serial.print(F("OBCTime: "));
-    Serial.println(obcTime);
-    
+    // check if there is updated telemetry...
+    // this flag will be cleared by calling getTelemetryXXX() function.
+    // this flag is set by loop() function, so
+    // you have to call loop() function before you call this.
+    if (Morikawa.hasTelemetryUpdate()) {
+        
+        // get OBC time
+        Morikawa.getTelemetryTime(TIME_OBCTIME, &obcTime);
+        
+        Serial.print(F("OBC Time: "));
+        Serial.println(obcTime);
+        
+        // get bus current as raw value
+        Morikawa.getTelemetryCurrent(CURRENT_BUS, &raw);
+        
+        Serial.print(F("Bus Current(raw): "));
+        Serial.println(static_cast<int>(raw));
+        
+        // get bus current as converted value
+        Morikawa.getTelemetryCurrent(CURRENT_BUS, &value);
+        
+        Serial.print(F("Bus Current(converted): "));
+        Serial.println(value);
+    }
     delay(200);
     return;
 }

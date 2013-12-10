@@ -59,29 +59,31 @@ class TSTFRAM {
                                     _morikawa;
     
     public:
-        static  unsigned long       getSize                 (void);
-                bool                isValid                 (void) const;
-                TSTError            setup                   (TSTMorikawa* morikawa);
-                void                cleanup                 (void);
-                TSTError            write                   (unsigned long address, void const* data, unsigned int size, unsigned int* result = NULL);
-                TSTError            writePGM                (unsigned long address, void const PROGMEM* data, unsigned int size, unsigned int* result = NULL);
-                TSTError            read                    (unsigned long address, void* data, unsigned int size, unsigned int* result = NULL);
-                TSTError            format                  (void);
+        static  unsigned long       getSize                     (void);
+        static  unsigned int        getPageSize                 (void);
+        static  unsigned long       getSectorSize               (void);
+                bool                isValid                     (void) const;
+                TSTError            setup                       (TSTMorikawa* morikawa);
+                void                cleanup                     (void);
+                TSTError            write                       (unsigned long address, void const* data, unsigned int size, unsigned int* result = NULL);
+                TSTError            writePGM                    (unsigned long address, void const PROGMEM* data, unsigned int size, unsigned int* result = NULL);
+                TSTError            read                        (unsigned long address, void* data, unsigned int size, unsigned int* result = NULL);
+                TSTError            format                      (void);
     private:
-        explicit                    TSTFRAM                 (void);
-                                    ~TSTFRAM                (void);
-        static  void                open                    (void);
-        static  void                close                   (void);
-                TSTError            check                   (unsigned long address, void const* data, unsigned int* size, unsigned int* result) const;
-                TSTError            write                   (unsigned long address, unsigned char const* ram, unsigned char const PROGMEM* rom, unsigned int size);
-                TSTError            read                    (unsigned long address, unsigned char* data, unsigned int size);
-        static  void                executeCommand          (unsigned char command);
-        static  void                beginTransfer           (unsigned char command);
-        static  void                endTransfer             (void);
-        static  void                transferAddress         (unsigned long address);
+        explicit                    TSTFRAM                     (void);
+                                    ~TSTFRAM                    (void);
+        static  void                open                        (void);
+        static  void                close                       (void);
+                TSTError            check                       (unsigned long address, void const* data, unsigned int* size, unsigned int* result) const;
+                TSTError            write                       (unsigned long address, unsigned char const* ram, unsigned char const PROGMEM* rom, unsigned int size);
+                TSTError            read                        (unsigned long address, unsigned char* data, unsigned int size);
+        static  void                executeCommand              (unsigned char command);
+        static  void                beginTransfer               (unsigned char command);
+        static  void                endTransfer                 (void);
+        static  void                transferAddress             (unsigned long address);
     private:
-                                    TSTFRAM                 (TSTFRAM const&);
-                TSTFRAM&            operator=               (TSTFRAM const&);
+                                    TSTFRAM                     (TSTFRAM const&);
+                TSTFRAM&            operator=                   (TSTFRAM const&);
     friend      class               TSTMorikawa;
 };
 

@@ -82,6 +82,22 @@ enum StatusEnum {
 #endif
 }
 
+/*public static */unsigned int TSTFRAM::getPageSize(void)
+{
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    return 0;
+}
+
+/*public static */unsigned long TSTFRAM::getSectorSize(void)
+{
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    return 0;
+}
+
 /*public */TSTError TSTFRAM::setup(TSTMorikawa* morikawa)
 {
     TSTError error(TSTERROR_OK);

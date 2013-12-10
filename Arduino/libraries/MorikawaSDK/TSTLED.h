@@ -65,17 +65,17 @@ class TSTLED {
                 unsigned char       _pwm[LED_LIMIT];
     
     public:
-                TSTError            set                     (LEDType index, unsigned char pwm);
-                unsigned char       get                     (LEDType index) const;
-                bool                isValid                 (void) const;
-                TSTError            setup                   (TSTMorikawa* morikawa);
-                void                cleanup                 (void);
+                TSTError            set                         (LEDType index, unsigned char pwm);
+                unsigned char       get                         (LEDType index) const;
+                bool                isValid                     (void) const;
+                TSTError            setup                       (TSTMorikawa* morikawa);
+                void                cleanup                     (void);
     private:
-        explicit                    TSTLED                  (void);
-                                    ~TSTLED                 (void);
+        explicit                    TSTLED                      (void);
+                                    ~TSTLED                     (void);
     private:
-                                    TSTLED                  (TSTLED const&);
-                TSTLED&             operator=               (TSTLED const&);
+                                    TSTLED                      (TSTLED const&);
+                TSTLED&             operator=                   (TSTLED const&);
     friend      class               TSTMorikawa;
 };
 

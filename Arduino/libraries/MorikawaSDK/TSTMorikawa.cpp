@@ -265,6 +265,22 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     return EEPROM_FLASHROM;
 }
 
+/*public static */unsigned int TSTMorikawa::getPageSizeEEPROM(void)
+{
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    return 0;
+}
+
+/*public static */unsigned long TSTMorikawa::getSectorSizeEEPROM(void)
+{
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    return 0;
+}
+
 /*public */unsigned long TSTMorikawa::getBootTime(void) const
 {
     unsigned long result(0);
@@ -306,157 +322,169 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 
 /*public */TSTError TSTMorikawa::getTelemetryTime(TimeType type, unsigned long* result) const
 {
-    static RuleRec const s_rule[TIME_LIMIT] PROGMEM = {
-        {TELEMETRY_TIME_OBCTIME_0, FORMULA_TIME}
-    };
+    RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
 #ifdef OPTION_BUILD_MEMORYLOG
     saveMemoryLog();
 #endif
-    if (0 <= type && type <= TIME_LIMIT) {
-        error = convertTelemetry(s_rule[type], result);
+    if ((error = checkTelemetryTime(type, result, &rule)) == TSTERROR_OK) {
+        convertTelemetry(rule, true, result);
     }
-    else {
-        error = TSTERROR_INVALID_PARAM;
+    return error;
+}
+
+/*public */TSTError TSTMorikawa::getTelemetryVoltage(VoltageType type, unsigned char* result) const
+{
+    RuleRec const PROGMEM* rule;
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    if ((error = checkTelemetryVoltage(type, result, &rule)) == TSTERROR_OK) {
+        convertTelemetry(rule, false, result);
     }
     return error;
 }
 
 /*public */TSTError TSTMorikawa::getTelemetryVoltage(VoltageType type, double* result) const
 {
-    static RuleRec const s_rule[VOLTAGE_LIMIT] PROGMEM = {
-        {TELEMETRY_VOLTAGE_BUS, FORMULA_DEFAULT},
-        {TELEMETRY_VOLTAGE_BATTERY, FORMULA_DEFAULT},
-        {TELEMETRY_VOLTAGE_SOLAR, FORMULA_DEFAULT}
-    };
+    RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
 #ifdef OPTION_BUILD_MEMORYLOG
     saveMemoryLog();
 #endif
-    if (0 <= type && type <= VOLTAGE_LIMIT) {
-        error = convertTelemetry(s_rule[type], result);
+    if ((error = checkTelemetryVoltage(type, result, &rule)) == TSTERROR_OK) {
+        convertTelemetry(rule, true, result);
     }
-    else {
-        error = TSTERROR_INVALID_PARAM;
+    return error;
+}
+
+/*public */TSTError TSTMorikawa::getTelemetryCurrent(CurrentType type, unsigned char* result) const
+{
+    RuleRec const PROGMEM* rule;
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    if ((error = checkTelemetryCurrent(type, result, &rule)) == TSTERROR_OK) {
+        convertTelemetry(rule, false, result);
     }
     return error;
 }
 
 /*public */TSTError TSTMorikawa::getTelemetryCurrent(CurrentType type, double* result) const
 {
-    static RuleRec const s_rule[CURRENT_LIMIT] PROGMEM = {
-        {TELEMETRY_CURRENT_BUS, FORMULA_CURRENT2},
-        {TELEMETRY_CURRENT_BATTERY, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_SOLAR, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_SOLAR_PX, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_SOLAR_MX, FORMULA_CURRENT2},
-        {TELEMETRY_CURRENT_SOLAR_PY1, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_SOLAR_MY1, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_SOLAR_PY2, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_SOLAR_MY2, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_SOLAR_PZ, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_SOLAR_MZ, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_POWERCPU, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_MAINCPU, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_MISSIONCPU, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_ANTENNA, FORMULA_CURRENT2},
-        {TELEMETRY_CURRENT_BATTERYHEATER, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_TX, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_CW, FORMULA_CURRENT1},
-        {TELEMETRY_CURRENT_RX, FORMULA_CURRENT1}
-    };
+    RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
 #ifdef OPTION_BUILD_MEMORYLOG
     saveMemoryLog();
 #endif
-    if (0 <= type && type <= CURRENT_LIMIT) {
-        error = convertTelemetry(s_rule[type], result);
+    if ((error = checkTelemetryCurrent(type, result, &rule)) == TSTERROR_OK) {
+        convertTelemetry(rule, true, result);
     }
-    else {
-        error = TSTERROR_INVALID_PARAM;
+    return error;
+}
+
+/*public */TSTError TSTMorikawa::getTelemetryTemperature(TemperatureType type, unsigned char* result) const
+{
+    RuleRec const PROGMEM* rule;
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    if ((error = checkTelemetryTemperature(type, result, &rule)) == TSTERROR_OK) {
+        convertTelemetry(rule, false, result);
     }
     return error;
 }
 
 /*public */TSTError TSTMorikawa::getTelemetryTemperature(TemperatureType type, double* result) const
 {
-    static RuleRec const s_rule[TEMPERATURE_LIMIT] PROGMEM = {
-        {TELEMETRY_TEMPERATURE_BATTERY1, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_BATTERY2, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_BATTERY3, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_SOLAR_PX, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_SOLAR_MX, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_SOLAR_PY1, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_SOLAR_MY1, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_SOLAR_PY2, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_SOLAR_MY2, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_SOLAR_PZ1, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_SOLAR_MZ1, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_SOLAR_PZ2, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_SOLAR_MZ2, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_POWERCPU, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_MAINCPU, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_MISSIONCPU, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_CWTX, FORMULA_TEMPERATURE},
-        {TELEMETRY_TEMPERATURE_RX, FORMULA_TEMPERATURE}
-    };
+    RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
 #ifdef OPTION_BUILD_MEMORYLOG
     saveMemoryLog();
 #endif
-    if (0 <= type && type <= TEMPERATURE_LIMIT) {
-        error = convertTelemetry(s_rule[type], result);
+    if ((error = checkTelemetryTemperature(type, result, &rule)) == TSTERROR_OK) {
+        convertTelemetry(rule, true, result);
     }
-    else {
-        error = TSTERROR_INVALID_PARAM;
+    return error;
+}
+
+/*public */TSTError TSTMorikawa::getTelemetryGyro(GyroType type, unsigned char* result) const
+{
+    RuleRec const PROGMEM* rule;
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    if ((error = checkTelemetryGyro(type, result, &rule)) == TSTERROR_OK) {
+        convertTelemetry(rule, false, result);
     }
     return error;
 }
 
 /*public */TSTError TSTMorikawa::getTelemetryGyro(GyroType type, double* result) const
 {
-    static RuleRec const s_rule[GYRO_LIMIT] PROGMEM = {
-        {TELEMETRY_GYRO_X, FORMULA_GYRO},
-        {TELEMETRY_GYRO_Y, FORMULA_GYRO},
-        {TELEMETRY_GYRO_Z, FORMULA_GYRO}
-    };
+    RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
 #ifdef OPTION_BUILD_MEMORYLOG
     saveMemoryLog();
 #endif
-    if (0 <= type && type <= GYRO_LIMIT) {
-        error = convertTelemetry(s_rule[type], result);
+    if ((error = checkTelemetryGyro(type, result, &rule)) == TSTERROR_OK) {
+        convertTelemetry(rule, true, result);
     }
-    else {
-        error = TSTERROR_INVALID_PARAM;
+    return error;
+}
+
+/*public */TSTError TSTMorikawa::getTelemetryMagnet(MagnetType type, unsigned char* result) const
+{
+    RuleRec const PROGMEM* rule;
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    if ((error = checkTelemetryMagnet(type, result, &rule)) == TSTERROR_OK) {
+        convertTelemetry(rule, false, result);
     }
     return error;
 }
 
 /*public */TSTError TSTMorikawa::getTelemetryMagnet(MagnetType type, double* result) const
 {
-    static RuleRec const s_rule[MAGNET_LIMIT] PROGMEM = {
-        {TELEMETRY_MAGNET_X, FORMULA_MAGNET},
-        {TELEMETRY_MAGNET_Y, FORMULA_MAGNET},
-        {TELEMETRY_MAGNET_Z, FORMULA_MAGNET}
-    };
+    RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
 #ifdef OPTION_BUILD_MEMORYLOG
     saveMemoryLog();
 #endif
-    if (0 <= type && type <= MAGNET_LIMIT) {
-        error = convertTelemetry(s_rule[type], result);
-    }
-    else {
-        error = TSTERROR_INVALID_PARAM;
+    if ((error = checkTelemetryMagnet(type, result, &rule)) == TSTERROR_OK) {
+        convertTelemetry(rule, true, result);
     }
     return error;
+}
+
+/*public */bool TSTMorikawa::hasTelemetryUpdate(void) const
+{
+    bool result(false);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    if (_state) {
+        result = _update;
+    }
+    return result;
 }
 
 /*public */bool TSTMorikawa::hasAbnormalShutdown(void) const
@@ -485,8 +513,9 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
         _index = 0;
         _overflow = false;
         _page = false;
-        _update = false;
+        _receive = false;
         memset(&_telemetry, 0, sizeof(_telemetry));
+        _update = false;
         _shutdown = false;
         _audio = true;
         _param.time = 0;
@@ -586,9 +615,10 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 #endif
     if (_state) {
         mutex.lock();
-        if (_update) {
+        if (_receive) {
             _page = !_page;
-            _update = false;
+            _update = true;
+            _receive = false;
         }
         mutex.unlock();
         if (_shutdown) {
@@ -869,46 +899,19 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     return;
 }
 
-/*private */TSTError TSTMorikawa::convertTelemetry(RuleRec const PROGMEM& rule, void* result) const
+/*private */TSTError TSTMorikawa::checkTelemetryTime(TimeType type, void* result, RuleRec const PROGMEM** rule) const
 {
-    TelemetryType index;
-    unsigned char telemetry;
+    static RuleRec const s_rule[TIME_LIMIT] PROGMEM = {
+        {TELEMETRY_TIME_OBCTIME_0, FORMULA_TIME}
+    };
     TSTError error(TSTERROR_OK);
     
 #ifdef OPTION_BUILD_MEMORYLOG
     saveMemoryLog();
 #endif
-    if (result != NULL) {
+    if ((0 <= type && type <= TIME_LIMIT) && result != NULL) {
         if (_state) {
-            index = pgm_read_byte(&rule.telemetry);
-            telemetry = _telemetry[_page][index];
-            switch (pgm_read_byte(&rule.formula)) {
-                case FORMULA_TIME:
-                    *static_cast<unsigned long*>(result) = (static_cast<unsigned long>(telemetry)                    << 24) |
-                                                           (static_cast<unsigned long>(_telemetry[_page][index + 1]) << 16) |
-                                                           (static_cast<unsigned long>(_telemetry[_page][index + 2]) <<  8) |
-                                                           (static_cast<unsigned long>(_telemetry[_page][index + 3]) <<  0);
-                    break;
-                case FORMULA_CURRENT1:
-                    *static_cast<double*>(result) = telemetry / 255.0;
-                    break;
-                case FORMULA_CURRENT2:
-                    *static_cast<double*>(result) = telemetry * 2.5 / 255.0;
-                    break;
-                case FORMULA_TEMPERATURE:
-                    *static_cast<double*>(result) = -1481.96 + sqrt(2.1952e+6 + (1.8639 - ((telemetry * 5.0 / 255.0 - 2.5) / 4.0 + 5.0 / 3.0)) / 3.88e-6);
-                    break;
-                case FORMULA_GYRO:
-                    *static_cast<double*>(result) = ((telemetry * 5.0 / 255.0 - 2.5) / 51.0 + 1.65 - 1.1 * 1.5) / (1.1 * 1.2e-2);
-                    break;
-                case FORMULA_MAGNET:
-                    *static_cast<double*>(result) = ((telemetry * 5.0 / 255.0 - 2.5) / 7.25 + 1.65 - 1.1 * 1.5) / (1.1 * 2.4e-6);
-                    break;
-                case FORMULA_DEFAULT:
-                default:
-                    *static_cast<double*>(result) = telemetry;
-                    break;
-            }
+            *rule = &s_rule[type];
         }
         else {
             error = TSTERROR_INVALID_STATE;
@@ -918,6 +921,213 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
         error = TSTERROR_INVALID_PARAM;
     }
     return error;
+}
+
+/*private */TSTError TSTMorikawa::checkTelemetryVoltage(VoltageType type, void* result, RuleRec const PROGMEM** rule) const
+{
+    static RuleRec const s_rule[VOLTAGE_LIMIT] PROGMEM = {
+        {TELEMETRY_VOLTAGE_BUS, FORMULA_DEFAULT},
+        {TELEMETRY_VOLTAGE_BATTERY, FORMULA_DEFAULT},
+        {TELEMETRY_VOLTAGE_SOLAR, FORMULA_DEFAULT}
+    };
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    if ((0 <= type && type <= VOLTAGE_LIMIT) && result != NULL) {
+        if (_state) {
+            *rule = &s_rule[type];
+        }
+        else {
+            error = TSTERROR_INVALID_STATE;
+        }
+    }
+    else {
+        error = TSTERROR_INVALID_PARAM;
+    }
+    return error;
+}
+
+/*private */TSTError TSTMorikawa::checkTelemetryCurrent(CurrentType type, void* result, RuleRec const PROGMEM** rule) const
+{
+    static RuleRec const s_rule[CURRENT_LIMIT] PROGMEM = {
+        {TELEMETRY_CURRENT_BUS, FORMULA_CURRENT2},
+        {TELEMETRY_CURRENT_BATTERY, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_SOLAR, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_SOLAR_PX, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_SOLAR_MX, FORMULA_CURRENT2},
+        {TELEMETRY_CURRENT_SOLAR_PY1, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_SOLAR_MY1, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_SOLAR_PY2, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_SOLAR_MY2, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_SOLAR_PZ, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_SOLAR_MZ, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_POWERCPU, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_MAINCPU, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_MISSIONCPU, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_ANTENNA, FORMULA_CURRENT2},
+        {TELEMETRY_CURRENT_BATTERYHEATER, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_TX, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_CW, FORMULA_CURRENT1},
+        {TELEMETRY_CURRENT_RX, FORMULA_CURRENT1}
+    };
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    if ((0 <= type && type <= CURRENT_LIMIT) && result != NULL) {
+        if (_state) {
+            *rule = &s_rule[type];
+        }
+        else {
+            error = TSTERROR_INVALID_STATE;
+        }
+    }
+    else {
+        error = TSTERROR_INVALID_PARAM;
+    }
+    return error;
+}
+
+/*private */TSTError TSTMorikawa::checkTelemetryTemperature(TemperatureType type, void* result, RuleRec const PROGMEM** rule) const
+{
+    static RuleRec const s_rule[TEMPERATURE_LIMIT] PROGMEM = {
+        {TELEMETRY_TEMPERATURE_BATTERY1, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_BATTERY2, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_BATTERY3, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_SOLAR_PX, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_SOLAR_MX, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_SOLAR_PY1, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_SOLAR_MY1, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_SOLAR_PY2, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_SOLAR_MY2, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_SOLAR_PZ1, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_SOLAR_MZ1, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_SOLAR_PZ2, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_SOLAR_MZ2, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_POWERCPU, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_MAINCPU, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_MISSIONCPU, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_CWTX, FORMULA_TEMPERATURE},
+        {TELEMETRY_TEMPERATURE_RX, FORMULA_TEMPERATURE}
+    };
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    if ((0 <= type && type <= TEMPERATURE_LIMIT) && result != NULL) {
+        if (_state) {
+            *rule = &s_rule[type];
+        }
+        else {
+            error = TSTERROR_INVALID_STATE;
+        }
+    }
+    else {
+        error = TSTERROR_INVALID_PARAM;
+    }
+    return error;
+}
+
+/*private */TSTError TSTMorikawa::checkTelemetryGyro(GyroType type, void* result, RuleRec const PROGMEM** rule) const
+{
+    static RuleRec const s_rule[GYRO_LIMIT] PROGMEM = {
+        {TELEMETRY_GYRO_X, FORMULA_GYRO},
+        {TELEMETRY_GYRO_Y, FORMULA_GYRO},
+        {TELEMETRY_GYRO_Z, FORMULA_GYRO}
+    };
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    if ((0 <= type && type <= GYRO_LIMIT) && result != NULL) {
+        if (_state) {
+            *rule = &s_rule[type];
+        }
+        else {
+            error = TSTERROR_INVALID_STATE;
+        }
+    }
+    else {
+        error = TSTERROR_INVALID_PARAM;
+    }
+    return error;
+}
+
+/*private */TSTError TSTMorikawa::checkTelemetryMagnet(MagnetType type, void* result, RuleRec const PROGMEM** rule) const
+{
+    static RuleRec const s_rule[MAGNET_LIMIT] PROGMEM = {
+        {TELEMETRY_MAGNET_X, FORMULA_MAGNET},
+        {TELEMETRY_MAGNET_Y, FORMULA_MAGNET},
+        {TELEMETRY_MAGNET_Z, FORMULA_MAGNET}
+    };
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    if ((0 <= type && type <= MAGNET_LIMIT) && result != NULL) {
+        if (_state) {
+            *rule = &s_rule[type];
+        }
+        else {
+            error = TSTERROR_INVALID_STATE;
+        }
+    }
+    else {
+        error = TSTERROR_INVALID_PARAM;
+    }
+    return error;
+}
+
+/*private */void TSTMorikawa::convertTelemetry(RuleRec const PROGMEM* rule, bool convert, void* result) const
+{
+    TelemetryType index;
+    unsigned char telemetry;
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    saveMemoryLog();
+#endif
+    index = pgm_read_byte(&rule->telemetry);
+    telemetry = _telemetry[_page][index];
+    if (convert) {
+        switch (pgm_read_byte(&rule->formula)) {
+            case FORMULA_TIME:
+                *static_cast<unsigned long*>(result) = (static_cast<unsigned long>(telemetry)                    << 24) |
+                                                       (static_cast<unsigned long>(_telemetry[_page][index + 1]) << 16) |
+                                                       (static_cast<unsigned long>(_telemetry[_page][index + 2]) <<  8) |
+                                                       (static_cast<unsigned long>(_telemetry[_page][index + 3]) <<  0);
+                break;
+            case FORMULA_CURRENT1:
+                *static_cast<double*>(result) = telemetry / 255.0;
+                break;
+            case FORMULA_CURRENT2:
+                *static_cast<double*>(result) = telemetry * 2.5 / 255.0;
+                break;
+            case FORMULA_TEMPERATURE:
+                *static_cast<double*>(result) = -1481.96 + sqrt(2.1952e+6 + (1.8639 - ((telemetry * 5.0 / 255.0 - 2.5) / 4.0 + 5.0 / 3.0)) / 3.88e-6);
+                break;
+            case FORMULA_GYRO:
+                *static_cast<double*>(result) = ((telemetry * 5.0 / 255.0 - 2.5) / 51.0 + 1.65 - 1.1 * 1.5) / (1.1 * 1.2e-2);
+                break;
+            case FORMULA_MAGNET:
+                *static_cast<double*>(result) = ((telemetry * 5.0 / 255.0 - 2.5) / 7.25 + 1.65 - 1.1 * 1.5) / (1.1 * 2.4e-6);
+                break;
+            case FORMULA_DEFAULT:
+            default:
+                *static_cast<double*>(result) = telemetry;
+                break;
+        }
+    }
+    else {
+        *static_cast<unsigned char*>(result) = telemetry;
+    }
+    _update = false;
+    return;
 }
 
 /*private static */TSTError TSTMorikawa::checkEEPROM(unsigned long address, void const* data, unsigned int* size, unsigned int* result)
@@ -1091,10 +1301,10 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     }
     if (i >= asciiesof(g_send)) {
         memcpy_P(&buffer[i], g_delimiter, lengthof(g_delimiter));
-        timer1 = TIMSK1;
+        timer1 = TIMSK1 & _BV(TOIE1);
         TIMSK1 &= ~_BV(TOIE1);
         Serial1.print(buffer);
-        TIMSK1 = timer1;
+        TIMSK1 |= timer1;
     }
     else {
         error = TSTERROR_FAILED;
@@ -1108,11 +1318,11 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     unsigned char usart1;
     unsigned char i2cm;
     
-    timer1 = TIMSK1;
+    timer1 = TIMSK1 & _BV(TOIE1);
     TIMSK1 &= ~_BV(TOIE1);
-    usart1 = UCSR1B;
+    usart1 = UCSR1B & _BV(RXCIE1);
     UCSR1B &= ~_BV(RXCIE1);
-    i2cm = TWCR;
+    i2cm = TWCR & _BV(TWIE);
     TWCR &= ~(_BV(TWIE) | _BV(TWINT));
     sei();
     
@@ -1122,9 +1332,9 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     getInstance().onReceivePacket();
     
     cli();
-    TWCR = i2cm & ~_BV(TWINT);
-    UCSR1B = usart1;
-    TIMSK1 = timer1;
+    TWCR = (TWCR | i2cm) & ~_BV(TWINT);
+    UCSR1B |= usart1;
+    TIMSK1 |= timer1;
     return;
 }
 
@@ -1225,7 +1435,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
                     if (packet.length == lengthof(_telemetry[!_page])) {
                         mutex.lock();
                         memcpy(_telemetry[!_page], packet.data, packet.length);
-                        _update = true;
+                        _receive = true;
                         mutex.unlock();
                     }
                     else {

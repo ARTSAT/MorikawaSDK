@@ -82,18 +82,18 @@ class TSTCamera {
                                     _morikawa;
     
     public:
-        static  TSTError            getFormat               (CameraType mode, CameraFormat* result);
-                bool                isValid                 (void) const;
-                TSTError            setup                   (TSTMorikawa* morikawa);
-                void                cleanup                 (void);
-                TSTError            snapshot                (CameraType mode, StorageType storage, unsigned long address, unsigned long size, unsigned long* result = NULL);
+        static  TSTError            getFormat                   (CameraType mode, CameraFormat* result);
+                bool                isValid                     (void) const;
+                TSTError            setup                       (TSTMorikawa* morikawa);
+                void                cleanup                     (void);
+                TSTError            snapshot                    (CameraType mode, StorageType storage, unsigned long address, unsigned long size, unsigned long* result = NULL);
     private:
-        explicit                    TSTCamera               (void);
-                                    ~TSTCamera              (void);
-                TSTError            transfer                (RegisterRec const PROGMEM* data, unsigned int size);
+        explicit                    TSTCamera                   (void);
+                                    ~TSTCamera                  (void);
+                TSTError            transfer                    (RegisterRec const PROGMEM* data, unsigned int size);
     private:
-                                    TSTCamera               (TSTCamera const&);
-                TSTCamera&          operator=               (TSTCamera const&);
+                                    TSTCamera                   (TSTCamera const&);
+                TSTCamera&          operator=                   (TSTCamera const&);
     friend      class               TSTMorikawa;
 };
 

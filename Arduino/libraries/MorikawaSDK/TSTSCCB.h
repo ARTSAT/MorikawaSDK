@@ -57,26 +57,26 @@ class SCCBStream : public Stream {
                 int                 _size;
     
     public:
-        static  SCCBStream&         getInstance             (void);
-                void                begin                   (void);
-                void                beginTransmission       (unsigned char address);
-                void                endTransmission         (void);
-                void                requestFrom             (unsigned char address);
-        virtual size_t              write                   (unsigned char data);
-        virtual int                 available               (void);
-        virtual int                 read                    (void);
-        virtual int                 peek                    (void);
-        virtual void                flush                   (void);
+        static  SCCBStream&         getInstance                 (void);
+                void                begin                       (void);
+                void                beginTransmission           (unsigned char address);
+                void                endTransmission             (void);
+                void                requestFrom                 (unsigned char address);
+        virtual size_t              write                       (unsigned char data);
+        virtual int                 available                   (void);
+        virtual int                 read                        (void);
+        virtual int                 peek                        (void);
+        virtual void                flush                       (void);
     private:
-        explicit                    SCCBStream              (void);
-        virtual                     ~SCCBStream             (void);
-        static  void                sccbStart               (unsigned char mode, unsigned char address);
-        static  void                sccbStop                (void);
-        static  void                sccbWrite               (unsigned char data);
-        static  unsigned char       sccbRead                (void);
+        explicit                    SCCBStream                  (void);
+        virtual                     ~SCCBStream                 (void);
+        static  void                sccbStart                   (unsigned char mode, unsigned char address);
+        static  void                sccbStop                    (void);
+        static  void                sccbWrite                   (unsigned char data);
+        static  unsigned char       sccbRead                    (void);
     private:
-                                    SCCBStream              (SCCBStream const&);
-                SCCBStream&         operator=               (SCCBStream const&);
+                                    SCCBStream                  (SCCBStream const&);
+                SCCBStream&         operator=                   (SCCBStream const&);
     using                           Print::write;
 };
 

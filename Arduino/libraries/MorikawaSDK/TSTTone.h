@@ -182,29 +182,29 @@ class TSTTone {
                 TSTTrinity<int>     _wpm;
     
     public:
-                TSTError            setNoteBPM              (int param = -1);
-                int                 getNoteBPM              (void) const;
-                TSTError            setMorseWPM             (int param = -1);
-                int                 getMorseWPM             (void) const;
-                bool                isValid                 (void) const;
-                TSTError            setup                   (TSTMorikawa* morikawa);
-                void                cleanup                 (void);
-                TSTError            playNote                (NoteType note, DurationType duration, QualifierType qualifier = QUALIFIER_NONE);
-                TSTError            playNote                (NoteSequence const* sequence, int length = -1);
-                TSTError            playNotePGM             (NoteSequence const PROGMEM* sequence, int length = -1);
-                TSTError            playMorse               (NoteType note, char character);
-                TSTError            playMorse               (NoteType note, char const* sequence, int length = -1);
-                TSTError            playMorsePGM            (NoteType note, char const PROGMEM* sequence, int length = -1);
+                TSTError            setNoteBPM                  (int param = -1);
+                int                 getNoteBPM                  (void) const;
+                TSTError            setMorseWPM                 (int param = -1);
+                int                 getMorseWPM                 (void) const;
+                bool                isValid                     (void) const;
+                TSTError            setup                       (TSTMorikawa* morikawa);
+                void                cleanup                     (void);
+                TSTError            playNote                    (NoteType note, DurationType duration, QualifierType qualifier = QUALIFIER_NONE);
+                TSTError            playNote                    (NoteSequence const* sequence, int length = -1);
+                TSTError            playNotePGM                 (NoteSequence const PROGMEM* sequence, int length = -1);
+                TSTError            playMorse                   (NoteType note, char character);
+                TSTError            playMorse                   (NoteType note, char const* sequence, int length = -1);
+                TSTError            playMorsePGM                (NoteType note, char const PROGMEM* sequence, int length = -1);
     private:
-        explicit                    TSTTone                 (void);
-                                    ~TSTTone                (void);
-                TSTError            playNote                (NoteSequence const* ram, NoteSequence const PROGMEM* rom, int length);
-                TSTError            playMorse               (NoteType note, char const* ram, char const PROGMEM* rom, int length);
-                void                executeNote             (NoteType note, DurationType duration, QualifierType qualifier);
-                void                executeMorse            (NoteType note, char character);
+        explicit                    TSTTone                     (void);
+                                    ~TSTTone                    (void);
+                TSTError            playNote                    (NoteSequence const* ram, NoteSequence const PROGMEM* rom, int length);
+                TSTError            playMorse                   (NoteType note, char const* ram, char const PROGMEM* rom, int length);
+                void                executeNote                 (NoteType note, DurationType duration, QualifierType qualifier);
+                void                executeMorse                (NoteType note, char character);
     private:
-                                    TSTTone                 (TSTTone const&);
-                TSTTone&            operator=               (TSTTone const&);
+                                    TSTTone                     (TSTTone const&);
+                TSTTone&            operator=                   (TSTTone const&);
     friend      class               TSTMorikawa;
 };
 

@@ -55,30 +55,30 @@ class TSTTrinity {
         mutable T volatile          _value[3];
     
     public:
-        explicit                    TSTTrinity              (void);
-                                    TSTTrinity              (TSTTrinity const& param);
-                                    TSTTrinity              (T param);
-                                    ~TSTTrinity             (void);
-                TSTTrinity&         operator=               (TSTTrinity const& param);
-                TSTTrinity&         operator=               (T param);
-                TSTTrinity&         operator+=              (T param);
-                TSTTrinity&         operator-=              (T param);
-                TSTTrinity&         operator*=              (T param);
-                TSTTrinity&         operator/=              (T param);
-                TSTTrinity&         operator%=              (T param);
-                TSTTrinity&         operator&=              (T param);
-                TSTTrinity&         operator|=              (T param);
-                TSTTrinity&         operator^=              (T param);
-                TSTTrinity&         operator<<=             (T param);
-                TSTTrinity&         operator>>=             (T param);
-                TSTTrinity&         operator++              (void);
-                TSTTrinity          operator++              (int);
-                TSTTrinity&         operator--              (void);
-                TSTTrinity          operator--              (int);
-                                    operator T              (void) const;
+        explicit                    TSTTrinity                  (void);
+                                    TSTTrinity                  (TSTTrinity const& param);
+                                    TSTTrinity                  (T param);
+                                    ~TSTTrinity                 (void);
+                TSTTrinity&         operator=                   (TSTTrinity const& param);
+                TSTTrinity&         operator=                   (T param);
+                TSTTrinity&         operator+=                  (T param);
+                TSTTrinity&         operator-=                  (T param);
+                TSTTrinity&         operator*=                  (T param);
+                TSTTrinity&         operator/=                  (T param);
+                TSTTrinity&         operator%=                  (T param);
+                TSTTrinity&         operator&=                  (T param);
+                TSTTrinity&         operator|=                  (T param);
+                TSTTrinity&         operator^=                  (T param);
+                TSTTrinity&         operator<<=                 (T param);
+                TSTTrinity&         operator>>=                 (T param);
+                TSTTrinity&         operator++                  (void);
+                TSTTrinity          operator++                  (int);
+                TSTTrinity&         operator--                  (void);
+                TSTTrinity          operator--                  (int);
+                                    operator T                  (void) const;
     private:
-                void                set                     (T param);
-                T                   get                     (void) const;
+                void                set                         (T param);
+                T                   get                         (void) const;
 };
 template <typename T>
 class TSTTrinity<T*> {
@@ -86,23 +86,23 @@ class TSTTrinity<T*> {
         mutable T* volatile         _value[3];
     
     public:
-        explicit                    TSTTrinity              (void);
-                                    TSTTrinity              (TSTTrinity const& param);
-                                    TSTTrinity              (T* param);
-                                    ~TSTTrinity             (void);
-                TSTTrinity&         operator=               (TSTTrinity const& param);
-                TSTTrinity&         operator=               (T* param);
-                TSTTrinity&         operator+=              (int param);
-                TSTTrinity&         operator-=              (int param);
-                TSTTrinity&         operator++              (void);
-                TSTTrinity          operator++              (int);
-                TSTTrinity&         operator--              (void);
-                TSTTrinity          operator--              (int);
-                T*                  operator->              (void) const;
-                                    operator T*             (void) const;
+        explicit                    TSTTrinity                  (void);
+                                    TSTTrinity                  (TSTTrinity const& param);
+                                    TSTTrinity                  (T* param);
+                                    ~TSTTrinity                 (void);
+                TSTTrinity&         operator=                   (TSTTrinity const& param);
+                TSTTrinity&         operator=                   (T* param);
+                TSTTrinity&         operator+=                  (int param);
+                TSTTrinity&         operator-=                  (int param);
+                TSTTrinity&         operator++                  (void);
+                TSTTrinity          operator++                  (int);
+                TSTTrinity&         operator--                  (void);
+                TSTTrinity          operator--                  (int);
+                T*                  operator->                  (void) const;
+                                    operator T*                 (void) const;
     private:
-                void                set                     (T* param);
-                T*                  get                     (void) const;
+                void                set                         (T* param);
+                T*                  get                         (void) const;
 };
 
 template <typename T>

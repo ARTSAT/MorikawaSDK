@@ -272,8 +272,9 @@ class TSTMorikawa {
                 TSTTrinity<bool>    _overflow;
                 unsigned char       _buffer[80];
                 TSTTrinity<bool>    _page;
-                TSTTrinity<bool>    _update;
+                TSTTrinity<bool>    _receive;
                 unsigned char       _telemetry[2][TELEMETRY_LIMIT];
+        mutable TSTTrinity<bool>    _update;
                 TSTTrinity<bool>    _shutdown;
                 TSTTrinity<bool>    _audio;
                 TSTSharedMemory::BootParamRec
@@ -287,111 +288,128 @@ class TSTMorikawa {
                 TSTCamera           _camera;
     
     public:
-        static  TSTMorikawa&        getInstance             (void);
-        static  TSTError            getMemorySpec           (MemorySpec* result);
-        static  TSTError            getMemoryInfo           (MemoryInfo* result);
-        static  TSTError            getMemoryLog            (MemoryInfo* result);
-        static  void                saveMemoryLog           (void);
-        static  TSTError            getSelfTestLog          (SelfTestLog* result);
-        static  void                eraseSelfTestLog        (void);
-        static  unsigned long       getSizeEEPROM           (void);
-        static  unsigned long       getSizeSharedMemory     (void);
-        static  unsigned long       getSizeFRAM             (void);
-        static  unsigned long       getSizeFlashROM         (void);
-        static  unsigned int        getPageSizeSharedMemory (void);
-        static  unsigned int        getPageSizeFlashROM     (void);
-        static  unsigned long       getSectorSizeFlashROM   (void);
-                unsigned long       getBootTime             (void) const;
-                unsigned char       getBootCount            (void) const;
-                unsigned char       getBootMode             (void) const;
-                TSTError            getParamNote            (NoteParam* result);
-                TSTError            getParamMorse           (MorseParam* result);
-                TSTError            getParamDigitalker      (DigitalkerParam* result);
-                TSTError            getParamCamera          (CameraParam* result);
-                TSTError            getTelemetryTime        (TimeType type, unsigned long* result) const;
-                TSTError            getTelemetryVoltage     (VoltageType type, double* result) const;
-                TSTError            getTelemetryCurrent     (CurrentType type, double* result) const;
-                TSTError            getTelemetryTemperature (TemperatureType type, double* result) const;
-                TSTError            getTelemetryGyro        (GyroType type, double* result) const;
-                TSTError            getTelemetryMagnet      (MagnetType type, double* result) const;
-                TSTError            setFlashROMEraseMode    (bool param);
-                bool                getFlashROMEraseMode    (void) const;
-                TSTError            setText                 (TextType index, char const* text, int length = -1);
-                TSTError            setTextPGM              (TextType index, char const PROGMEM* text, int length = -1);
-                TSTError            getText                 (TextType index, char* text, unsigned int length, int* result = NULL);
-                TSTError            setLED                  (LEDType index, unsigned char pwm);
-                unsigned char       getLED                  (LEDType index) const;
-                TSTError            setNoteBPM              (int param = -1);
-                int                 getNoteBPM              (void) const;
-                TSTError            setMorseWPM             (int param = -1);
-                int                 getMorseWPM             (void) const;
-                TSTError            setSpeakAsyncMode       (bool param);
-                bool                getSpeakAsyncMode       (void) const;
-                bool                isValid                 (void) const;
-                bool                isValidSharedMemory     (void) const;
-                bool                isValidFRAM             (void) const;
-                bool                isValidFlashROM         (void) const;
-                bool                isValidLED              (void) const;
-                bool                isValidTone             (void) const;
-                bool                isValidDigitalker       (void) const;
-                bool                isValidCamera           (void) const;
-                TSTError            isBusyDigitalker        (bool* result) const;
-                bool                hasAbnormalShutdown     (void) const;
-                TSTError            setup                   (void);
-                void                cleanup                 (void);
-        static  void                shutdown                (void);
-                void                loop                    (void);
-        static  TSTError            writeEEPROM             (unsigned long address, void const* data, unsigned int size, unsigned int* result = NULL);
-        static  TSTError            writeEEPROMPGM          (unsigned long address, void const PROGMEM* data, unsigned int size, unsigned int* result = NULL);
-        static  TSTError            readEEPROM              (unsigned long address, void* data, unsigned int size, unsigned int* result = NULL);
-        static  TSTError            formatEEPROM            (void);
-                TSTError            writeSharedMemory       (unsigned long address, void const* data, unsigned int size, unsigned int* result = NULL);
-                TSTError            writeSharedMemoryPGM    (unsigned long address, void const PROGMEM* data, unsigned int size, unsigned int* result = NULL);
-                TSTError            readSharedMemory        (unsigned long address, void* data, unsigned int size, unsigned int* result = NULL);
-                TSTError            formatSharedMemory      (void);
-                TSTError            writeFRAM               (unsigned long address, void const* data, unsigned int size, unsigned int* result = NULL);
-                TSTError            writeFRAMPGM            (unsigned long address, void const PROGMEM* data, unsigned int size, unsigned int* result = NULL);
-                TSTError            readFRAM                (unsigned long address, void* data, unsigned int size, unsigned int* result = NULL);
-                TSTError            formatFRAM              (void);
-                TSTError            writeFlashROM           (unsigned long address, void const* data, unsigned int size, unsigned int* result = NULL);
-                TSTError            writeFlashROMPGM        (unsigned long address, void const PROGMEM* data, unsigned int size, unsigned int* result = NULL);
-                TSTError            readFlashROM            (unsigned long address, void* data, unsigned int size, unsigned int* result = NULL);
-                TSTError            formatFlashROM          (void);
-                TSTError            playNote                (NoteType note, DurationType duration, QualifierType qualifier = QUALIFIER_NONE);
-                TSTError            playNote                (NoteSequence const* sequence, int length = -1);
-                TSTError            playNotePGM             (NoteSequence const PROGMEM* sequence, int length = -1);
-                TSTError            playMorse               (NoteType note, char character);
-                TSTError            playMorse               (NoteType note, char const* sequence, int length = -1);
-                TSTError            playMorsePGM            (NoteType note, char const PROGMEM* sequence, int length = -1);
-                TSTError            speakPhrase             (char const* phrase, int length = -1);
-                TSTError            speakPhrasePGM          (char const PROGMEM* phrase, int length = -1);
-                TSTError            waitPhrase              (void);
-                TSTError            stopPhrase              (void);
-                TSTError            freezeFastLZ            (StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, StorageType wstorage, unsigned long waddress, unsigned long wsize, unsigned long* result);
-                TSTError            meltFastLZ              (StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, unsigned long* result);
-                TSTError            enableAudioBus          (void);
-                void                disableAudioBus         (void);
+        static  TSTMorikawa&        getInstance                 (void);
+        static  TSTError            getMemorySpec               (MemorySpec* result);
+        static  TSTError            getMemoryInfo               (MemoryInfo* result);
+        static  TSTError            getMemoryLog                (MemoryInfo* result);
+        static  void                saveMemoryLog               (void);
+        static  TSTError            getSelfTestLog              (SelfTestLog* result);
+        static  void                eraseSelfTestLog            (void);
+        static  unsigned long       getSizeEEPROM               (void);
+        static  unsigned long       getSizeSharedMemory         (void);
+        static  unsigned long       getSizeFRAM                 (void);
+        static  unsigned long       getSizeFlashROM             (void);
+        static  unsigned int        getPageSizeEEPROM           (void);
+        static  unsigned int        getPageSizeSharedMemory     (void);
+        static  unsigned int        getPageSizeFRAM             (void);
+        static  unsigned int        getPageSizeFlashROM         (void);
+        static  unsigned long       getSectorSizeEEPROM         (void);
+        static  unsigned long       getSectorSizeSharedMemory   (void);
+        static  unsigned long       getSectorSizeFRAM           (void);
+        static  unsigned long       getSectorSizeFlashROM       (void);
+                unsigned long       getBootTime                 (void) const;
+                unsigned char       getBootCount                (void) const;
+                unsigned char       getBootMode                 (void) const;
+                TSTError            getParamNote                (NoteParam* result);
+                TSTError            getParamMorse               (MorseParam* result);
+                TSTError            getParamDigitalker          (DigitalkerParam* result);
+                TSTError            getParamCamera              (CameraParam* result);
+                TSTError            getTelemetryTime            (TimeType type, unsigned long* result) const;
+                TSTError            getTelemetryVoltage         (VoltageType type, unsigned char* result) const;
+                TSTError            getTelemetryVoltage         (VoltageType type, double* result) const;
+                TSTError            getTelemetryCurrent         (CurrentType type, unsigned char* result) const;
+                TSTError            getTelemetryCurrent         (CurrentType type, double* result) const;
+                TSTError            getTelemetryTemperature     (TemperatureType type, unsigned char* result) const;
+                TSTError            getTelemetryTemperature     (TemperatureType type, double* result) const;
+                TSTError            getTelemetryGyro            (GyroType type, unsigned char* result) const;
+                TSTError            getTelemetryGyro            (GyroType type, double* result) const;
+                TSTError            getTelemetryMagnet          (MagnetType type, unsigned char* result) const;
+                TSTError            getTelemetryMagnet          (MagnetType type, double* result) const;
+                TSTError            setFlashROMEraseMode        (bool param);
+                bool                getFlashROMEraseMode        (void) const;
+                TSTError            setText                     (TextType index, char const* text, int length = -1);
+                TSTError            setTextPGM                  (TextType index, char const PROGMEM* text, int length = -1);
+                TSTError            getText                     (TextType index, char* text, unsigned int length, int* result = NULL);
+                TSTError            setLED                      (LEDType index, unsigned char pwm);
+                unsigned char       getLED                      (LEDType index) const;
+                TSTError            setNoteBPM                  (int param = -1);
+                int                 getNoteBPM                  (void) const;
+                TSTError            setMorseWPM                 (int param = -1);
+                int                 getMorseWPM                 (void) const;
+                TSTError            setSpeakAsyncMode           (bool param);
+                bool                getSpeakAsyncMode           (void) const;
+                bool                isValid                     (void) const;
+                bool                isValidSharedMemory         (void) const;
+                bool                isValidFRAM                 (void) const;
+                bool                isValidFlashROM             (void) const;
+                bool                isValidLED                  (void) const;
+                bool                isValidTone                 (void) const;
+                bool                isValidDigitalker           (void) const;
+                bool                isValidCamera               (void) const;
+                TSTError            isBusyDigitalker            (bool* result) const;
+                bool                hasTelemetryUpdate          (void) const;
+                bool                hasAbnormalShutdown         (void) const;
+                TSTError            setup                       (void);
+                void                cleanup                     (void);
+        static  void                shutdown                    (void);
+                void                loop                        (void);
+        static  TSTError            writeEEPROM                 (unsigned long address, void const* data, unsigned int size, unsigned int* result = NULL);
+        static  TSTError            writeEEPROMPGM              (unsigned long address, void const PROGMEM* data, unsigned int size, unsigned int* result = NULL);
+        static  TSTError            readEEPROM                  (unsigned long address, void* data, unsigned int size, unsigned int* result = NULL);
+        static  TSTError            formatEEPROM                (void);
+                TSTError            writeSharedMemory           (unsigned long address, void const* data, unsigned int size, unsigned int* result = NULL);
+                TSTError            writeSharedMemoryPGM        (unsigned long address, void const PROGMEM* data, unsigned int size, unsigned int* result = NULL);
+                TSTError            readSharedMemory            (unsigned long address, void* data, unsigned int size, unsigned int* result = NULL);
+                TSTError            formatSharedMemory          (void);
+                TSTError            writeFRAM                   (unsigned long address, void const* data, unsigned int size, unsigned int* result = NULL);
+                TSTError            writeFRAMPGM                (unsigned long address, void const PROGMEM* data, unsigned int size, unsigned int* result = NULL);
+                TSTError            readFRAM                    (unsigned long address, void* data, unsigned int size, unsigned int* result = NULL);
+                TSTError            formatFRAM                  (void);
+                TSTError            writeFlashROM               (unsigned long address, void const* data, unsigned int size, unsigned int* result = NULL);
+                TSTError            writeFlashROMPGM            (unsigned long address, void const PROGMEM* data, unsigned int size, unsigned int* result = NULL);
+                TSTError            readFlashROM                (unsigned long address, void* data, unsigned int size, unsigned int* result = NULL);
+                TSTError            formatFlashROM              (void);
+                TSTError            playNote                    (NoteType note, DurationType duration, QualifierType qualifier = QUALIFIER_NONE);
+                TSTError            playNote                    (NoteSequence const* sequence, int length = -1);
+                TSTError            playNotePGM                 (NoteSequence const PROGMEM* sequence, int length = -1);
+                TSTError            playMorse                   (NoteType note, char character);
+                TSTError            playMorse                   (NoteType note, char const* sequence, int length = -1);
+                TSTError            playMorsePGM                (NoteType note, char const PROGMEM* sequence, int length = -1);
+                TSTError            speakPhrase                 (char const* phrase, int length = -1);
+                TSTError            speakPhrasePGM              (char const PROGMEM* phrase, int length = -1);
+                TSTError            waitPhrase                  (void);
+                TSTError            stopPhrase                  (void);
+                TSTError            freezeFastLZ                (StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, StorageType wstorage, unsigned long waddress, unsigned long wsize, unsigned long* result);
+                TSTError            meltFastLZ                  (StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, unsigned long* result);
+                TSTError            enableAudioBus              (void);
+                void                disableAudioBus             (void);
     private:
-        explicit                    TSTMorikawa             (void);
-                                    ~TSTMorikawa            (void);
-        static  void                initializeI2C           (void);
-        static  void                initializeSPI           (void);
-        static  void                initializeRandom        (unsigned long time);
-        static  void                writeSelfTestLog        (unsigned int address, void const* data, unsigned int size);
-                void                shareSelfTestLog        (void);
-                TSTError            convertTelemetry        (RuleRec const PROGMEM& rule, void* result) const;
-        static  TSTError            checkEEPROM             (unsigned long address, void const* data, unsigned int* size, unsigned int* result);
-                TSTError            checkFastLZ             (StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, StorageType wstorage, unsigned long waddress, unsigned long wsize, unsigned long* result) const;
-        static  TSTError            sendRequest             (char to, char const PROGMEM* command);
-        static  TSTError            sendResponse            (char to, char const PROGMEM* command);
-        static  TSTError            sendPacket              (char mode, char to, char const PROGMEM* command);
-        static  void                onTimer                 (void);
-                void                onReceivePacket         (void);
-                void                onReceiveRequest        (PacketRec const& packet);
-                void                onReceiveResponse       (PacketRec const& packet);
+        explicit                    TSTMorikawa                 (void);
+                                    ~TSTMorikawa                (void);
+        static  void                initializeI2C               (void);
+        static  void                initializeSPI               (void);
+        static  void                initializeRandom            (unsigned long time);
+        static  void                writeSelfTestLog            (unsigned int address, void const* data, unsigned int size);
+                void                shareSelfTestLog            (void);
+                TSTError            checkTelemetryTime          (TimeType type, void* result, RuleRec const PROGMEM** rule) const;
+                TSTError            checkTelemetryVoltage       (VoltageType type, void* result, RuleRec const PROGMEM** rule) const;
+                TSTError            checkTelemetryCurrent       (CurrentType type, void* result, RuleRec const PROGMEM** rule) const;
+                TSTError            checkTelemetryTemperature   (TemperatureType type, void* result, RuleRec const PROGMEM** rule) const;
+                TSTError            checkTelemetryGyro          (GyroType type, void* result, RuleRec const PROGMEM** rule) const;
+                TSTError            checkTelemetryMagnet        (MagnetType type, void* result, RuleRec const PROGMEM** rule) const;
+                void                convertTelemetry            (RuleRec const PROGMEM* rule, bool convert, void* result) const;
+        static  TSTError            checkEEPROM                 (unsigned long address, void const* data, unsigned int* size, unsigned int* result);
+                TSTError            checkFastLZ                 (StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, StorageType wstorage, unsigned long waddress, unsigned long wsize, unsigned long* result) const;
+        static  TSTError            sendRequest                 (char to, char const PROGMEM* command);
+        static  TSTError            sendResponse                (char to, char const PROGMEM* command);
+        static  TSTError            sendPacket                  (char mode, char to, char const PROGMEM* command);
+        static  void                onTimer                     (void);
+                void                onReceivePacket             (void);
+                void                onReceiveRequest            (PacketRec const& packet);
+                void                onReceiveResponse           (PacketRec const& packet);
     private:
-                                    TSTMorikawa             (TSTMorikawa const&);
-                TSTMorikawa&        operator=               (TSTMorikawa const&);
+                                    TSTMorikawa                 (TSTMorikawa const&);
+                TSTMorikawa&        operator=                   (TSTMorikawa const&);
 };
 
 /*private */inline TSTMorikawa::TSTMorikawa(void) : _state(false)
@@ -423,9 +441,24 @@ class TSTMorikawa {
     return TSTSharedMemory::getPageSize();
 }
 
+/*public static */inline unsigned int TSTMorikawa::getPageSizeFRAM(void)
+{
+    return TSTFRAM::getPageSize();
+}
+
 /*public static */inline unsigned int TSTMorikawa::getPageSizeFlashROM(void)
 {
     return TSTFlashROM::getPageSize();
+}
+
+/*public static */inline unsigned long TSTMorikawa::getSectorSizeSharedMemory(void)
+{
+    return TSTSharedMemory::getSectorSize();
+}
+
+/*public static */inline unsigned long TSTMorikawa::getSectorSizeFRAM(void)
+{
+    return TSTFRAM::getSectorSize();
 }
 
 /*public static */inline unsigned long TSTMorikawa::getSectorSizeFlashROM(void)
