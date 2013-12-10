@@ -23,8 +23,13 @@ static unsigned long getSizeEEPROM(void);<br/>
 static unsigned long getSizeSharedMemory(void);<br/>
 static unsigned long getSizeFRAM(void);<br/>
 static unsigned long getSizeFlashROM(void);<br/>
+static unsigned int getPageSizeEEPROM(void);<br/>
 static unsigned int getPageSizeSharedMemory(void);<br/>
+static unsigned int getPageSizeFRAM(void);<br/>
 static unsigned int getPageSizeFlashROM(void);<br/>
+static unsigned long getSectorSizeEEPROM(void);<br/>
+static unsigned long getSectorSizeSharedMemory(void);<br/>
+static unsigned long getSectorSizeFRAM(void);<br/>
 static unsigned long getSectorSizeFlashROM(void);<br/>
 <br/>
 // boot parameter<br/>
@@ -40,10 +45,15 @@ TSTError getParamCamera(CameraParam* result);<br/>
 <br/>
 // telemetry data<br/>
 TSTError getTelemetryTime(TimeType type, unsigned long* result) const;<br/>
+TSTError getTelemetryVoltage(VoltageType type, unsigned char* result) const;<br/>
 TSTError getTelemetryVoltage(VoltageType type, double* result) const;<br/>
+TSTError getTelemetryCurrent(CurrentType type, unsigned char* result) const;<br/>
 TSTError getTelemetryCurrent(CurrentType type, double* result) const;<br/>
+TSTError getTelemetryTemperature(TemperatureType type, unsigned char* result) const;<br/>
 TSTError getTelemetryTemperature(TemperatureType type, double* result) const;<br/>
+TSTError getTelemetryGyro(GyroType type, unsigned char* result) const;<br/>
 TSTError getTelemetryGyro(GyroType type, double* result) const;<br/>
+TSTError getTelemetryMagnet(MagnetType type, unsigned char* result) const;<br/>
 TSTError getTelemetryMagnet(MagnetType type, double* result) const;<br/>
 <br/>
 // FlashROM mode<br/>
@@ -79,6 +89,7 @@ bool isValidCamera(void) const;<br/>
 <br/>
 // status<br/>
 TSTError isBusyDigitalker(bool* result) const;<br/>
+bool hasTelemetryUpdate(void) const;<br/>
 bool hasAbnormalShutdown(void) const;<br/>
 <br/>
 // core function<br/>
