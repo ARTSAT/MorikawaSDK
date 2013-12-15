@@ -123,6 +123,9 @@ TSTError readFlashROM(unsigned long address, void* data, unsigned int size, unsi
 TSTError formatFlashROM(void);<br/>
 <br/>
 // note and morse<br/>
+TSTError playFrequency(FrequencyType frequency, unsigned long duration);<br/>
+TSTError playFrequency(FrequencySequence const* sequence, int length = -1);<br/>
+TSTError playFrequencyPGM(FrequencySequence const PROGMEM* sequence, int length = -1);<br/>
 TSTError playNote(NoteType note, DurationType duration, QualifierType qualifier = QUALIFIER_NONE);<br/>
 TSTError playNote(NoteSequence const* sequence, int length = -1);<br/>
 TSTError playNotePGM(NoteSequence const PROGMEM* sequence, int length = -1);<br/>
