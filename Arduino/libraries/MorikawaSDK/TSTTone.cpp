@@ -146,6 +146,62 @@ namespace tst {
     return;
 }
 
+/*public */TSTError TSTTone::playFrequency(FrequencyType frequency, unsigned long duration)
+{
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    if (_morikawa != NULL) {
+        if (!_morikawa->hasAbnormalShutdown()) {
+            if (_morikawa->enableAudioBus() != TSTERROR_OK) {
+                // force execute
+            }
+            executeFrequency(frequency, duration);
+        }
+        else {
+            error = TSTERROR_INVALID_STATE;
+        }
+    }
+    else {
+        error = TSTERROR_INVALID_STATE;
+    }
+    return error;
+}
+
+/*public */TSTError TSTTone::playFrequency(FrequencySequence const* sequence, int length)
+{
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    if (sequence != NULL) {
+        error = playFrequency(sequence, NULL, length);
+    }
+    else {
+        error = TSTERROR_INVALID_PARAM;
+    }
+    return error;
+}
+
+/*public */TSTError TSTTone::playFrequencyPGM(FrequencySequence const PROGMEM* sequence, int length)
+{
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    if (sequence != NULL) {
+        error = playFrequency(NULL, sequence, length);
+    }
+    else {
+        error = TSTERROR_INVALID_PARAM;
+    }
+    return error;
+}
+
 /*public */TSTError TSTTone::playNote(NoteType note, DurationType duration, QualifierType qualifier)
 {
     TSTError error(TSTERROR_OK);
@@ -258,6 +314,56 @@ namespace tst {
     return error;
 }
 
+/*private */TSTError TSTTone::playFrequency(register FrequencySequence const* ram, register FrequencySequence const PROGMEM* rom, register int length)
+{
+    FrequencyType frequency;
+    unsigned long duration;
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    if (_morikawa != NULL) {
+        if (!_morikawa->hasAbnormalShutdown()) {
+            if (_morikawa->enableAudioBus() != TSTERROR_OK) {
+                // force execute
+            }
+            while (true) {
+                if (ram != NULL) {
+                    frequency = ram->frequency;
+                    duration = ram->duration;
+                    ++ram;
+                }
+                else {
+                    frequency = pgm_read_word(&rom->frequency);
+                    duration = pgm_read_dword(&rom->duration);
+                    ++rom;
+                }
+                if (frequency <= FREQUENCY_END) {
+                    break;
+                }
+                else if (length >= 0) {
+                    if (--length < 0) {
+                        break;
+                    }
+                }
+                else if (_morikawa->hasAbnormalShutdown()) {
+                    error = TSTERROR_ABNORMAL_SHUTDOWN;
+                    break;
+                }
+                executeFrequency(frequency, duration);
+            }
+        }
+        else {
+            error = TSTERROR_INVALID_STATE;
+        }
+    }
+    else {
+        error = TSTERROR_INVALID_STATE;
+    }
+    return error;
+}
+
 /*private */TSTError TSTTone::playNote(register NoteSequence const* ram, register NoteSequence const PROGMEM* rom, register int length)
 {
     NoteType note;
@@ -286,7 +392,7 @@ namespace tst {
                     qualifier = pgm_read_byte(&rom->qualifier);
                     ++rom;
                 }
-                if (note == NOTE_END) {
+                if (note <= NOTE_END) {
                     break;
                 }
                 else if (length >= 0) {
@@ -333,7 +439,7 @@ namespace tst {
                     character = pgm_read_byte(rom);
                     ++rom;
                 }
-                if (character == '\0') {
+                if (character <= '\0') {
                     break;
                 }
                 else if (length >= 0) {
@@ -358,6 +464,23 @@ namespace tst {
     return error;
 }
 
+/*private */void TSTTone::executeFrequency(FrequencyType frequency, unsigned long duration)
+{
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    if (duration > 0) {
+        if (frequency > FREQUENCY_REST) {
+            tone(PIN_TONE_WAVE, frequency, duration);
+            while (TIMSK2 & (1 << OCIE2A));
+        }
+        else {
+            delay(duration);
+        }
+    }
+    return;
+}
+
 /*private */void TSTTone::executeNote(NoteType note, DurationType duration, QualifierType qualifier)
 {
     unsigned long time;
@@ -365,39 +488,41 @@ namespace tst {
 #ifdef OPTION_BUILD_MEMORYLOG
     TSTMorikawa::saveMemoryLog();
 #endif
-    switch (qualifier) {
-        case QUALIFIER_DOT:
-            time = 1500000UL / duration;
-            break;
-        case QUALIFIER_DOTDOT:
-            time = 1750000UL / duration;
-            break;
-        case QUALIFIER_TRIPLE:
-            time = 666667UL / duration;
-            break;
-        case QUALIFIER_QUINTUPLE:
-            time = 800000UL / duration;
-            break;
-        case QUALIFIER_SEXTUPLE:
-            time = 666667UL / duration;
-            break;
-        case QUALIFIER_SEPTUPLE:
-            time = 571429UL / duration;
-            break;
-        case QUALIFIER_NONUPLE:
-            time = 888889UL / duration;
-            break;
-        default:
-            time = 1000000UL / duration;
-            break;
-    }
-    time = time * 240 / _bpm / 1000;
-    if (note != NOTE_REST) {
-        tone(PIN_TONE_WAVE, note, time);
-        while (TIMSK2 & (1 << OCIE2A));
-    }
-    else {
-        delay(time);
+    if (duration > 0) {
+        switch (qualifier) {
+            case QUALIFIER_DOT:
+                time = 1500000UL / duration;
+                break;
+            case QUALIFIER_DOTDOT:
+                time = 1750000UL / duration;
+                break;
+            case QUALIFIER_TRIPLE:
+                time = 666667UL / duration;
+                break;
+            case QUALIFIER_QUINTUPLE:
+                time = 800000UL / duration;
+                break;
+            case QUALIFIER_SEXTUPLE:
+                time = 666667UL / duration;
+                break;
+            case QUALIFIER_SEPTUPLE:
+                time = 571429UL / duration;
+                break;
+            case QUALIFIER_NONUPLE:
+                time = 888889UL / duration;
+                break;
+            default:
+                time = 1000000UL / duration;
+                break;
+        }
+        time = time * 240 / _bpm / 1000;
+        if (note > NOTE_REST) {
+            tone(PIN_TONE_WAVE, note, time);
+            while (TIMSK2 & (1 << OCIE2A));
+        }
+        else {
+            delay(time);
+        }
     }
     return;
 }

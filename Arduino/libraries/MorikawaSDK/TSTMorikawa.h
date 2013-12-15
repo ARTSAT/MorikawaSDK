@@ -369,6 +369,9 @@ class TSTMorikawa {
                 TSTError            writeFlashROMPGM            (unsigned long address, void const PROGMEM* data, unsigned int size, unsigned int* result = NULL);
                 TSTError            readFlashROM                (unsigned long address, void* data, unsigned int size, unsigned int* result = NULL);
                 TSTError            formatFlashROM              (void);
+                TSTError            playFrequency               (FrequencyType frequency, unsigned long duration);
+                TSTError            playFrequency               (FrequencySequence const* sequence, int length = -1);
+                TSTError            playFrequencyPGM            (FrequencySequence const PROGMEM* sequence, int length = -1);
                 TSTError            playNote                    (NoteType note, DurationType duration, QualifierType qualifier = QUALIFIER_NONE);
                 TSTError            playNote                    (NoteSequence const* sequence, int length = -1);
                 TSTError            playNotePGM                 (NoteSequence const PROGMEM* sequence, int length = -1);
@@ -654,6 +657,21 @@ class TSTMorikawa {
 /*public */inline TSTError TSTMorikawa::formatFlashROM(void)
 {
     return _flash.format();
+}
+
+/*public */inline TSTError TSTMorikawa::playFrequency(FrequencyType frequency, unsigned long duration)
+{
+    return _tone.playFrequency(frequency, duration);
+}
+
+/*public */inline TSTError TSTMorikawa::playFrequency(FrequencySequence const* sequence, int length)
+{
+    return _tone.playFrequency(sequence, length);
+}
+
+/*public */inline TSTError TSTMorikawa::playFrequencyPGM(FrequencySequence const PROGMEM* sequence, int length)
+{
+    return _tone.playFrequencyPGM(sequence, length);
 }
 
 /*public */inline TSTError TSTMorikawa::playNote(NoteType note, DurationType duration, QualifierType qualifier)

@@ -52,6 +52,11 @@
 
 namespace tst {
 
+enum FrequencyEnum {
+    FREQUENCY_END           = -1,
+    FREQUENCY_REST          = 0
+};
+typedef int                 FrequencyType;
 enum NoteEnum {
     NOTE_END                = -1,
     NOTE_REST               = 0,
@@ -168,6 +173,10 @@ enum QualifierEnum {
 };
 typedef unsigned char       QualifierType;
 
+struct FrequencySequence {
+    FrequencyType           frequency;
+    unsigned long           duration;
+};
 struct NoteSequence {
     NoteType                note;
     DurationType            duration;
@@ -189,6 +198,9 @@ class TSTTone {
                 bool                isValid                     (void) const;
                 TSTError            setup                       (TSTMorikawa* morikawa);
                 void                cleanup                     (void);
+                TSTError            playFrequency               (FrequencyType frequency, unsigned long duration);
+                TSTError            playFrequency               (FrequencySequence const* sequence, int length = -1);
+                TSTError            playFrequencyPGM            (FrequencySequence const PROGMEM* sequence, int length = -1);
                 TSTError            playNote                    (NoteType note, DurationType duration, QualifierType qualifier = QUALIFIER_NONE);
                 TSTError            playNote                    (NoteSequence const* sequence, int length = -1);
                 TSTError            playNotePGM                 (NoteSequence const PROGMEM* sequence, int length = -1);
@@ -198,8 +210,10 @@ class TSTTone {
     private:
         explicit                    TSTTone                     (void);
                                     ~TSTTone                    (void);
+                TSTError            playFrequency               (FrequencySequence const* ram, FrequencySequence const PROGMEM* rom, int length);
                 TSTError            playNote                    (NoteSequence const* ram, NoteSequence const PROGMEM* rom, int length);
                 TSTError            playMorse                   (NoteType note, char const* ram, char const PROGMEM* rom, int length);
+                void                executeFrequency            (FrequencyType frequency, unsigned long duration);
                 void                executeNote                 (NoteType note, DurationType duration, QualifierType qualifier);
                 void                executeMorse                (NoteType note, char character);
     private:
