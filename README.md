@@ -32,6 +32,9 @@ static unsigned long getSectorSizeSharedMemory(void);<br/>
 static unsigned long getSectorSizeFRAM(void);<br/>
 static unsigned long getSectorSizeFlashROM(void);<br/>
 <br/>
+// camera format information<br/>
+static TSTError getCameraFormat(CameraType mode, CameraFormat* result);<br/>
+<br/>
 // boot parameter<br/>
 unsigned long getBootTime(void) const;<br/>
 unsigned char getBootCount(void) const;<br/>
@@ -138,6 +141,9 @@ TSTError speakPhrase(char const* phrase, int length = -1);<br/>
 TSTError speakPhrasePGM(char const PROGMEM* phrase, int length = -1);<br/>
 TSTError waitPhrase(void);<br/>
 TSTError stopPhrase(void);<br/>
+<br/>
+// camera<br/>
+TSTError snapshotCamera(CameraType mode, StorageType storage, unsigned long address, unsigned long size, unsigned long* result);<br/>
 <br/>
 // data compression / decompression<br/>
 TSTError freezeFastLZ(StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, StorageType wstorage, unsigned long waddress, unsigned long wsize, unsigned long* result);<br/>
