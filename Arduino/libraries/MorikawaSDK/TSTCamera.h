@@ -51,22 +51,22 @@
 namespace tst {
 
 enum CameraEnum {
+    CAMERA_RAW_VGA,
+    CAMERA_RAW_QVGA,
+    CAMERA_RAW_QCIF,
     CAMERA_RGB565_QVGA,
     CAMERA_RGB565_QQVGA,
     CAMERA_RGB565_QQCIF,
     CAMERA_YUV422_QVGA,
     CAMERA_YUV422_QQVGA,
     CAMERA_YUV422_QQCIF,
-    CAMERA_RAW_VGA,
-    CAMERA_RAW_QVGA,
-    CAMERA_RAW_QCIF,
     CAMERA_LIMIT
 };
 typedef unsigned char       CameraType;
 
 struct CameraFormat {
-    unsigned char           width;
-    unsigned char           height;
+    unsigned int            width;
+    unsigned int            height;
     unsigned char           depth;
 };
 class TSTMorikawa;
@@ -75,6 +75,11 @@ class TSTCamera {
         struct RegisterRec {
             unsigned char           address;
             unsigned char           value;
+        };
+        struct ModeRec {
+            RegisterRec const PROGMEM*
+                                    data;
+            unsigned int            length;
         };
     
     private:
@@ -86,11 +91,16 @@ class TSTCamera {
                 bool                isValid                     (void) const;
                 TSTError            setup                       (TSTMorikawa* morikawa);
                 void                cleanup                     (void);
-                TSTError            snapshot                    (CameraType mode, StorageType storage, unsigned long address, unsigned long size, unsigned long* result = NULL);
+                TSTError            snapshot                    (CameraType mode, StorageType storage, unsigned long address, unsigned long size, unsigned long* result);
     private:
         explicit                    TSTCamera                   (void);
                                     ~TSTCamera                  (void);
-                TSTError            transfer                    (RegisterRec const PROGMEM* data, unsigned int size);
+        static  void                wake                        (void);
+        static  void                sleep                       (void);
+        static  void                reset                       (void);
+        static  unsigned char       read                        (void);
+                TSTError            synchronize                 (bool state) const;
+                TSTError            transfer                    (RegisterRec const PROGMEM* data, unsigned int length) const;
     private:
                                     TSTCamera                   (TSTCamera const&);
                 TSTCamera&          operator=                   (TSTCamera const&);

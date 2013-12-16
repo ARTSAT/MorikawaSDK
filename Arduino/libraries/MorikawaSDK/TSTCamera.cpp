@@ -53,24 +53,27 @@ namespace tst {
 #define REGISTER_DELAY      (300)
 
 static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
-    {320, 240, 2},
-    {160, 120, 2},
-    { 88,  72, 2},
-    {320, 240, 2},
-    {160, 120, 2},
-    { 88,  72, 2},
     {640, 480, 1},
     {320, 240, 1},
-    {176, 144, 1}
+    {176, 144, 1},
+    {320, 240, 2},
+    {160, 120, 2},
+    { 88,  72, 2},
+    {320, 240, 2},
+    {160, 120, 2},
+    { 88,  72, 2}
 };
 
 /*public static */TSTError TSTCamera::getFormat(CameraType mode, CameraFormat* result)
 {
     TSTError error(TSTERROR_OK);
     
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
     if ((0 <= mode && mode < CAMERA_LIMIT) && result != NULL) {
-        result->width = pgm_read_byte(&g_format[mode].width);
-        result->height = pgm_read_byte(&g_format[mode].height);
+        result->width = pgm_read_word(&g_format[mode].width);
+        result->height = pgm_read_word(&g_format[mode].height);
         result->depth = pgm_read_byte(&g_format[mode].depth);
     }
     else {
@@ -95,7 +98,7 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
             pinMode(PIN_CAMERA_VSYNC, INPUT);
             pinMode(PIN_CAMERA_HREF, INPUT);
             pinMode(PIN_CAMERA_WEN, OUTPUT);
-            digitalWrite(PIN_CAMERA_WEN, HIGH);
+            digitalWrite(PIN_CAMERA_WEN, LOW);
             pinMode(PIN_CAMERA_RRST, OUTPUT);
             digitalWrite(PIN_CAMERA_RRST, HIGH);
             pinMode(PIN_CAMERA_OE, OUTPUT);
@@ -123,6 +126,7 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
+        digitalWrite(PIN_CAMERA_POWER, LOW);
         _morikawa = NULL;
     }
     return;
@@ -130,8 +134,6 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
 
 /*public */TSTError TSTCamera::snapshot(CameraType mode, StorageType storage, unsigned long address, unsigned long size, unsigned long* result)
 {
-    typedef unsigned long (*StorageGetSize)(void);
-    typedef TSTError (TSTMorikawa::*StorageWrite)(unsigned long, void const*, unsigned int, unsigned int*);
     static RegisterRec const s_initialize[] PROGMEM = {
         {0x11, 0x81},   // CLKRC 80 = 12M 81 = 6M bf = 1/128
         {0x15, 0x02},   // vsync negative
@@ -223,6 +225,58 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
         {0xB8, 0x0A},   // rsvd
         {0xC8, 0xF0},   // rsvd
         {0xC9, 0x60}    // SATCTR saturation
+    };
+    static RegisterRec const s_standby[] PROGMEM = {
+        {0x6B, 0x0A},   // PLL control 0A = x1, 4A = x4
+        {0x11, 0xBF}    // Clockrc 1/128
+    };
+    static RegisterRec const s_RAW_VGA[] PROGMEM = {        // RAW VGA (640x480 1byte/pixel)
+        {0x12, 0x01},   // COM7
+        {0x0C, 0x00},	// COM3
+        {0x3E, 0x00},	// COM14
+        {0x70, 0x3A},   // SCALING_XSC
+        {0x71, 0x35},   // SCALING_YSC
+        {0x72, 0x11},   // SCALING_DCWCTR
+        {0x73, 0xF0},   // SCALING_PCLK_DIV
+        {0xA2, 0x02},	// SCALING_PCLK_DELAY
+        {0x17, 0x13},   // HSTART
+        {0x18, 0x01},   // HSTOP
+        {0x19, 0x02},   // VSTART
+        {0x1A, 0x7A},   // VSTOP
+        {0x32, 0xB6},   // HREF
+        {0x03, 0x0A}    // VREF
+    };
+    static RegisterRec const s_RAW_QVGA[] PROGMEM = {       // RAW QVGA (320x240 1byte/pixel)
+        {0x12, 0x11},   // COM7
+        {0x0C, 0x04},	// COM3
+        {0x3E, 0x1A},	// COM14
+        {0x70, 0x3A},   // SCALING_XSC
+        {0x71, 0x35},   // SCALING_YSC
+        {0x72, 0x11},   // SCALING_DCWCTR
+        {0x73, 0xF9},   // SCALING_PCLK_DIV
+        {0xA2, 0x02},	// SCALING_PCLK_DELAY
+        {0x17, 0x16},   // HSTART
+        {0x18, 0x04},   // HSTOP
+        {0x19, 0x02},   // VSTART
+        {0x1A, 0x7A},   // VSTOP
+        {0x32, 0x80},   // HREF
+        {0x03, 0x0A}    // VREF
+    };
+    static RegisterRec const s_RAW_QCIF[] PROGMEM = {       // RAW QCIF (176x144 1byte/pixel)
+        {0x12, 0x0D},   // COM7 0d
+        {0x0C, 0x0C},   // COM3: scaling on
+        {0x3E, 0x1A},	// COM14
+        {0x70, 0x3A},   // SCALING_XSC
+        {0x71, 0x35},   // SCALING_YSC
+        {0x72, 0x11},   // SCALING_DCWCTR
+        {0x73, 0xF9},   // SCALING_PCLK_DIV
+        {0xA2, 0x52},	// SCALING_PCLK_DELAY
+        {0x17, 0x39},   // HSTART
+        {0x18, 0x03},   // HSTOP
+        {0x19, 0x03},   // VSTART
+        {0x1A, 0x7B},   // VSTOP
+        {0x32, 0x03},   // HREF
+        {0x03, 0x02}    // VREF
     };
     static RegisterRec const s_RGB565_QVGA[] PROGMEM = {    // RGB565 QVGA (320x240 2byte/pixel)
         {0x12, 0x04},   // COM7
@@ -320,170 +374,125 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
         {0x32, 0xA4},   // HREF
         {0x03, 0x0A}    // VREF
     };
-    static RegisterRec const s_RAW_VGA[] PROGMEM = {        // RAW VGA (640x480 1byte/pixel)
-        {0x12, 0x01},   // COM7
-        {0x0C, 0x00},	// COM3
-        {0x3E, 0x00},	// COM14
-        {0x70, 0x3A},   // SCALING_XSC
-        {0x71, 0x35},   // SCALING_YSC
-        {0x72, 0x11},   // SCALING_DCWCTR
-        {0x73, 0xF0},   // SCALING_PCLK_DIV
-        {0xA2, 0x02},	// SCALING_PCLK_DELAY
-        {0x17, 0x13},   // HSTART
-        {0x18, 0x01},   // HSTOP
-        {0x19, 0x02},   // VSTART
-        {0x1A, 0x7A},   // VSTOP
-        {0x32, 0xB6},   // HREF
-        {0x03, 0x0A}    // VREF
+    static ModeRec const s_mode[CAMERA_LIMIT] PROGMEM = {
+        {s_RAW_VGA,      lengthof(s_RAW_VGA)},
+        {s_RAW_QVGA,     lengthof(s_RAW_QVGA)},
+        {s_RAW_QCIF,     lengthof(s_RAW_QCIF)},
+        {s_RGB565_QVGA,  lengthof(s_RGB565_QVGA)},
+        {s_RGB565_QQVGA, lengthof(s_RGB565_QQVGA)},
+        {s_RGB565_QQCIF, lengthof(s_RGB565_QQCIF)},
+        {s_YUV422_QVGA,  lengthof(s_YUV422_QVGA)},
+        {s_YUV422_QQVGA, lengthof(s_YUV422_QQVGA)},
+        {s_YUV422_QQCIF, lengthof(s_YUV422_QQCIF)}
     };
-    static RegisterRec const s_RAW_QVGA[] PROGMEM = {       // RAW QVGA (320x240 1byte/pixel)
-        {0x12, 0x11},   // COM7
-        {0x0C, 0x04},	// COM3
-        {0x3E, 0x1A},	// COM14
-        {0x70, 0x3A},   // SCALING_XSC
-        {0x71, 0x35},   // SCALING_YSC
-        {0x72, 0x11},   // SCALING_DCWCTR
-        {0x73, 0xF9},   // SCALING_PCLK_DIV
-        {0xA2, 0x02},	// SCALING_PCLK_DELAY
-        {0x17, 0x16},   // HSTART
-        {0x18, 0x04},   // HSTOP
-        {0x19, 0x02},   // VSTART
-        {0x1A, 0x7A},   // VSTOP
-        {0x32, 0x80},   // HREF
-        {0x03, 0x0A}    // VREF
+    static unsigned long (*const s_getSize[STORAGE_LIMIT])(void) = {
+        NULL, &TSTMorikawa::getSizeSharedMemory, &TSTMorikawa::getSizeFRAM, &TSTMorikawa::getSizeFlashROM
     };
-    static RegisterRec const s_RAW_QCIF[] PROGMEM = {       // RAW QCIF (176x144 1byte/pixel)
-        {0x12, 0x0D},   // COM7 0d
-        {0x0C, 0x0C},   // COM3: scaling on
-        {0x3E, 0x1A},	// COM14
-        {0x70, 0x3A},   // SCALING_XSC
-        {0x71, 0x35},   // SCALING_YSC
-        {0x72, 0x11},   // SCALING_DCWCTR
-        {0x73, 0xF9},   // SCALING_PCLK_DIV
-        {0xA2, 0x52},	// SCALING_PCLK_DELAY
-        {0x17, 0x39},   // HSTART
-        {0x18, 0x03},   // HSTOP
-        {0x19, 0x03},   // VSTART
-        {0x1A, 0x7B},   // VSTOP
-        {0x32, 0x03},   // HREF
-        {0x03, 0x02}    // VREF
-    };
-    static RegisterRec const s_standby[] PROGMEM = {
-        {0x6B, 0x0A},   // PLL control 0A = x1, 4A = x4
-        {0x11, 0xBF}    // Clockrc 1/128
-    };
-    static StorageGetSize const s_getSize[STORAGE_LIMIT] = {
-        &TSTMorikawa::getSizeSharedMemory, &TSTMorikawa::getSizeFRAM, &TSTMorikawa::getSizeFlashROM
-    };
-    static StorageWrite const s_write[STORAGE_LIMIT] = {
-        &TSTMorikawa::writeSharedMemory, &TSTMorikawa::writeFRAM, &TSTMorikawa::writeFlashROM
+    static TSTError (TSTMorikawa::*const s_write[STORAGE_LIMIT])(unsigned long, void const*, unsigned int, unsigned int*) = {
+        NULL, &TSTMorikawa::writeSharedMemory, &TSTMorikawa::writeFRAM, &TSTMorikawa::writeFlashROM
     };
     unsigned char temp[128];
     register int width;
     register int height;
     register int depth;
+    unsigned long total;
     register int x;
     register int y;
     register int i;
     register int j;
     TSTError error(TSTERROR_OK);
     
-    if ((0 <= mode && mode < CAMERA_LIMIT) && (0 <= storage && storage < STORAGE_LIMIT)) {
-        if (_morikawa != NULL) {
-            digitalWrite(PIN_CAMERA_POWER, HIGH);
-            delay(BOOT_DELAY);
-            if ((error = transfer(s_initialize, lengthof(s_initialize))) == TSTERROR_OK) {
-                switch (mode) {
-                    case CAMERA_RGB565_QVGA:
-                        error = transfer(s_RGB565_QVGA, lengthof(s_RGB565_QVGA));
-                        break;
-                    case CAMERA_RGB565_QQVGA:
-                        error = transfer(s_RGB565_QQVGA, lengthof(s_RGB565_QQVGA));
-                        break;
-                    case CAMERA_RGB565_QQCIF:
-                        error = transfer(s_RGB565_QQCIF, lengthof(s_RGB565_QQCIF));
-                        break;
-                    case CAMERA_YUV422_QVGA:
-                        error = transfer(s_YUV422_QVGA, lengthof(s_YUV422_QVGA));
-                        break;
-                    case CAMERA_YUV422_QQVGA:
-                        error = transfer(s_YUV422_QQVGA, lengthof(s_YUV422_QQVGA));
-                        break;
-                    case CAMERA_YUV422_QQCIF:
-                        error = transfer(s_YUV422_QQCIF, lengthof(s_YUV422_QQCIF));
-                        break;
-                    case CAMERA_RAW_VGA:
-                        error = transfer(s_RAW_VGA, lengthof(s_RAW_VGA));
-                        break;
-                    case CAMERA_RAW_QVGA:
-                        error = transfer(s_RAW_QVGA, lengthof(s_RAW_QVGA));
-                        break;
-                    case CAMERA_RAW_QCIF:
-                        error = transfer(s_RAW_QCIF, lengthof(s_RAW_QCIF));
-                        break;
-                    default:
-                        error = TSTERROR_FAILED;
-                        break;
-                }
-                if (error == TSTERROR_OK) {
-                    digitalWrite(PIN_CAMERA_RRST, LOW);
-                    digitalWrite(PIN_CAMERA_RCLK, HIGH);
-                    digitalWrite(PIN_CAMERA_RCLK, LOW);
-                    digitalWrite(PIN_CAMERA_RRST, HIGH);
-                    digitalWrite(PIN_CAMERA_RCLK, HIGH);
-                    digitalWrite(PIN_CAMERA_RCLK, LOW);
-                    
-                    while (digitalRead(PIN_CAMERA_VSYNC) == HIGH);
-                    while (!digitalRead(PIN_CAMERA_VSYNC) == HIGH);
-                    digitalWrite(PIN_CAMERA_WEN, HIGH);
-                    while (digitalRead(PIN_CAMERA_VSYNC) == HIGH);
-                    digitalWrite(PIN_CAMERA_WEN, LOW);
-                    
-                    if ((error = transfer(s_standby, lengthof(s_standby))) == TSTERROR_OK) {
-                        digitalWrite(PIN_CAMERA_RRST, LOW);
-                        digitalWrite(PIN_CAMERA_RCLK, HIGH);
-                        digitalWrite(PIN_CAMERA_RCLK, LOW);
-                        digitalWrite(PIN_CAMERA_RRST, HIGH);
-                        
-                        width = pgm_read_byte(&g_format[mode].width);
-                        height = pgm_read_byte(&g_format[mode].height);
-                        depth = pgm_read_byte(&g_format[mode].depth);
-                        for (y = 0, j = 0; y < height; ++y) {
-                            for (x = 0; x < width; ++x) {
-                                for (i = 0; i < depth; ++i) {
-                                    digitalWrite(PIN_CAMERA_RCLK, HIGH);
-                                    temp[j] = PINC;
-                                    digitalWrite(PIN_CAMERA_RCLK, LOW);
-                                    if (++j >= lengthof(temp)) {
-                                        if ((error = (_morikawa->*s_write[storage])(address, temp, j, NULL)) == TSTERROR_OK) {
-                                            address += j;
-                                        }
-                                        else {
-                                            break;
-                                        }
-                                        j = 0;
-                                    }
-                                }
-                                if (error != TSTERROR_OK) {
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    if ((0 <= mode && mode < CAMERA_LIMIT) && result != NULL) {
+        if (STORAGE_NONE < storage && storage < STORAGE_LIMIT) {
+            if (address + size <= (*s_getSize[storage])()) {
+                width = pgm_read_word(&g_format[mode].width);
+                height = pgm_read_word(&g_format[mode].height);
+                depth = pgm_read_byte(&g_format[mode].depth);
+                total = static_cast<unsigned long>(width) * height * depth;
+                if (size >= total) {
+                    if (_morikawa != NULL) {
+                        if (!_morikawa->hasAbnormalShutdown()) {
+                            wake();
+                            reset();
+                            for (i = 0; i < 128; ++i) {
+                                if (_morikawa->hasAbnormalShutdown()) {
+                                    error = TSTERROR_ABNORMAL_SHUTDOWN;
                                     break;
                                 }
+                                read();
                             }
-                            if (error != TSTERROR_OK) {
-                                break;
+                            if (error == TSTERROR_OK) {
+                                if ((error = transfer(s_initialize, lengthof(s_initialize))) == TSTERROR_OK) {
+                                    if ((error = transfer(reinterpret_cast<RegisterRec const PROGMEM*>(pgm_read_word(&s_mode[mode].data)), pgm_read_word(&s_mode[mode].length))) == TSTERROR_OK) {
+                                        if ((error = synchronize(true)) == TSTERROR_OK) {
+                                            if ((error = synchronize(false)) == TSTERROR_OK) {
+                                                digitalWrite(PIN_CAMERA_WEN, HIGH);
+                                                error = synchronize(true);
+                                                digitalWrite(PIN_CAMERA_WEN, LOW);
+                                                if (error == TSTERROR_OK) {
+                                                    if ((error = transfer(s_standby, lengthof(s_standby))) == TSTERROR_OK) {
+                                                        reset();
+                                                        for (y = 0, j = 0; y < height; ++y) {
+                                                            for (x = 0; x < width; ++x) {
+                                                                for (i = 0; i < depth; ++i) {
+                                                                    if (_morikawa->hasAbnormalShutdown()) {
+                                                                        error = TSTERROR_ABNORMAL_SHUTDOWN;
+                                                                        break;
+                                                                    }
+                                                                    temp[j] = read();
+                                                                    if (++j >= lengthof(temp)) {
+                                                                        if ((error = (_morikawa->*s_write[storage])(address, temp, j, NULL)) == TSTERROR_OK) {
+                                                                            address += j;
+                                                                        }
+                                                                        else {
+                                                                            break;
+                                                                        }
+                                                                        j = 0;
+                                                                    }
+                                                                }
+                                                                if (error != TSTERROR_OK) {
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (error != TSTERROR_OK) {
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (error == TSTERROR_OK) {
+                                                            if ((error = (_morikawa->*s_write[storage])(address, temp, j, NULL)) == TSTERROR_OK) {
+                                                                *result = total;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
+                            sleep();
                         }
-                        if (error == TSTERROR_OK) {
-                            if ((error = (_morikawa->*s_write[storage])(address, temp, j, NULL)) == TSTERROR_OK) {
-                                address += j;
-                            }
+                        else {
+                            error = TSTERROR_INVALID_STATE;
                         }
                     }
+                    else {
+                        error = TSTERROR_INVALID_STATE;
+                    }
+                }
+                else {
+                    error = TSTERROR_INVALID_PARAM;
                 }
             }
-            digitalWrite(PIN_CAMERA_POWER, LOW);
+            else {
+                error = TSTERROR_INVALID_PARAM;
+            }
         }
         else {
-            error = TSTERROR_INVALID_STATE;
+            error = TSTERROR_INVALID_STORAGE;
         }
     }
     else {
@@ -492,34 +501,91 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     return error;
 }
 
-/*private */TSTError TSTCamera::transfer(register RegisterRec const PROGMEM* data, register unsigned int size)
+/*private static */void TSTCamera::wake(void)
 {
-    RegisterRec temp;
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    digitalWrite(PIN_CAMERA_POWER, HIGH);
+    delay(BOOT_DELAY);
+    digitalWrite(PIN_CAMERA_WEN, LOW);
+    digitalWrite(PIN_CAMERA_RRST, HIGH);
+    digitalWrite(PIN_CAMERA_OE, HIGH);
+    digitalWrite(PIN_CAMERA_RCLK, LOW);
+    digitalWrite(PIN_CAMERA_OE, LOW);
+    return;
+}
+
+/*private static */void TSTCamera::sleep(void)
+{
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    digitalWrite(PIN_CAMERA_OE, HIGH);
+    digitalWrite(PIN_CAMERA_POWER, LOW);
+    return;
+}
+
+/*private static */void TSTCamera::reset(void)
+{
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    digitalWrite(PIN_CAMERA_RRST, LOW);
+    digitalWrite(PIN_CAMERA_RCLK, HIGH);
+    digitalWrite(PIN_CAMERA_RCLK, LOW);
+    digitalWrite(PIN_CAMERA_RRST, HIGH);
+    return;
+}
+
+/*private static */unsigned char TSTCamera::read(void)
+{
+    unsigned char result(PINC);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    digitalWrite(PIN_CAMERA_RCLK, HIGH);
+    digitalWrite(PIN_CAMERA_RCLK, LOW);
+    return result;
+}
+
+/*private */TSTError TSTCamera::synchronize(bool state) const
+{
+    register unsigned char value;
     TSTError error(TSTERROR_OK);
     
-    for (; size > 0; --size, ++data) {
-        temp.address = pgm_read_byte(&data->address);
-        temp.value = pgm_read_byte(&data->value);
-        SCCB.beginTransmission(SCCB_ADDRESS);
-        SCCB.write(temp.address);
-        SCCB.write(temp.value);
-        SCCB.endTransmission();
-        SCCB.beginTransmission(SCCB_ADDRESS);
-        SCCB.write(temp.address);
-        SCCB.endTransmission();
-        SCCB.requestFrom(SCCB_ADDRESS);
-        if (SCCB.available() > 0) {
-            if (SCCB.read() != temp.value) {
-                error = TSTERROR_FAILED;
-                break;
-            }
-        }
-        else {
-            error = TSTERROR_FAILED;
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    value = (state) ? (HIGH) : (LOW);
+    while (digitalRead(PIN_CAMERA_VSYNC) == value) {
+        if (_morikawa->hasAbnormalShutdown()) {
+            error = TSTERROR_ABNORMAL_SHUTDOWN;
             break;
         }
     }
-    if (size <= 0) {
+    return error;
+}
+
+/*private */TSTError TSTCamera::transfer(register RegisterRec const PROGMEM* data, register unsigned int length) const
+{
+    TSTError error(TSTERROR_OK);
+    
+#ifdef OPTION_BUILD_MEMORYLOG
+    TSTMorikawa::saveMemoryLog();
+#endif
+    for (; length > 0; --length, ++data) {
+        if (_morikawa->hasAbnormalShutdown()) {
+            error = TSTERROR_ABNORMAL_SHUTDOWN;
+            break;
+        }
+        SCCB.beginTransmission(SCCB_ADDRESS);
+        SCCB.write(pgm_read_byte(&data->address));
+        SCCB.write(pgm_read_byte(&data->value));
+        SCCB.endTransmission();
+    }
+    if (error == TSTERROR_OK) {
         delay(REGISTER_DELAY);
     }
     return error;

@@ -307,6 +307,7 @@ class TSTMorikawa {
         static  unsigned long       getSectorSizeSharedMemory   (void);
         static  unsigned long       getSectorSizeFRAM           (void);
         static  unsigned long       getSectorSizeFlashROM       (void);
+        static  TSTError            getCameraFormat             (CameraType mode, CameraFormat* result);
                 unsigned long       getBootTime                 (void) const;
                 unsigned char       getBootCount                (void) const;
                 unsigned char       getBootMode                 (void) const;
@@ -382,6 +383,7 @@ class TSTMorikawa {
                 TSTError            speakPhrasePGM              (char const PROGMEM* phrase, int length = -1);
                 TSTError            waitPhrase                  (void);
                 TSTError            stopPhrase                  (void);
+                TSTError            snapshotCamera              (CameraType mode, StorageType storage, unsigned long address, unsigned long size, unsigned long* result);
                 TSTError            freezeFastLZ                (StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, StorageType wstorage, unsigned long waddress, unsigned long wsize, unsigned long* result);
                 TSTError            meltFastLZ                  (StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, unsigned long* result);
                 TSTError            enableAudioBus              (void);
@@ -467,6 +469,11 @@ class TSTMorikawa {
 /*public static */inline unsigned long TSTMorikawa::getSectorSizeFlashROM(void)
 {
     return TSTFlashROM::getSectorSize();
+}
+
+/*public static */inline TSTError TSTMorikawa::getCameraFormat(CameraType mode, CameraFormat* result)
+{
+    return TSTCamera::getFormat(mode, result);
 }
 
 /*public */inline TSTError TSTMorikawa::getParamNote(NoteParam* result)
@@ -722,6 +729,11 @@ class TSTMorikawa {
 /*public */inline TSTError TSTMorikawa::stopPhrase(void)
 {
     return _digitalker.stopPhrase();
+}
+
+/*public */inline TSTError TSTMorikawa::snapshotCamera(CameraType mode, StorageType storage, unsigned long address, unsigned long size, unsigned long* result)
+{
+    return _camera.snapshot(mode, storage, address, size, result);
 }
 
 }// end of namespace

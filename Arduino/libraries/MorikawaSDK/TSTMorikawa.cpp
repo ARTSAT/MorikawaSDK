@@ -1165,7 +1165,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 
 /*private */TSTError TSTMorikawa::checkFastLZ(StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, StorageType wstorage, unsigned long waddress, unsigned long wsize, unsigned long* result) const
 {
-    static unsigned long (*const getSize[STORAGE_LIMIT])(void) = {
+    static unsigned long (*const s_getSize[STORAGE_LIMIT])(void) = {
         NULL, &getSizeSharedMemory, &getSizeFRAM, &getSizeFlashROM
     };
     TSTError error(TSTERROR_OK);
@@ -1177,14 +1177,14 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
         case STORAGE_SHAREDMEMORY:
         case STORAGE_FRAM:
         case STORAGE_FLASHROM:
-            if (iaddress + isize <= (*getSize[istorage])()) {
+            if (iaddress + isize <= (*s_getSize[istorage])()) {
                 switch (ostorage) {
                     case STORAGE_NONE:
                         // nop
                         break;
                     case STORAGE_SHAREDMEMORY:
                     case STORAGE_FRAM:
-                        if (oaddress + osize <= (*getSize[ostorage])()) {
+                        if (oaddress + osize <= (*s_getSize[ostorage])()) {
                             if (istorage == ostorage) {
                                 if (oaddress < iaddress + isize && iaddress < oaddress + osize) {
                                     error = TSTERROR_INVALID_PARAM;
@@ -1196,7 +1196,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
                                         // nop
                                         break;
                                     case STORAGE_FRAM:
-                                        if (waddress + wsize <= (*getSize[wstorage])()) {
+                                        if (waddress + wsize <= (*s_getSize[wstorage])()) {
                                             if (ostorage == wstorage) {
                                                 if (waddress < oaddress + osize && oaddress < waddress + wsize) {
                                                     error = TSTERROR_INVALID_PARAM;
