@@ -428,43 +428,43 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
                                 if ((error = transfer(s_initialize, lengthof(s_initialize))) == TSTERROR_OK) {
                                     if ((error = transfer(reinterpret_cast<RegisterRec const PROGMEM*>(pgm_read_word(&s_mode[mode].data)), pgm_read_word(&s_mode[mode].length))) == TSTERROR_OK) {
                                         if ((error = synchronize(true)) == TSTERROR_OK) {
+                                            digitalWrite(PIN_CAMERA_WEN, HIGH);
                                             if ((error = synchronize(false)) == TSTERROR_OK) {
-                                                digitalWrite(PIN_CAMERA_WEN, HIGH);
                                                 error = synchronize(true);
-                                                digitalWrite(PIN_CAMERA_WEN, LOW);
-                                                if (error == TSTERROR_OK) {
-                                                    if ((error = transfer(s_standby, lengthof(s_standby))) == TSTERROR_OK) {
-                                                        reset();
-                                                        for (y = 0, j = 0; y < height; ++y) {
-                                                            for (x = 0; x < width; ++x) {
-                                                                for (i = 0; i < depth; ++i) {
-                                                                    if (_morikawa->hasAbnormalShutdown()) {
-                                                                        error = TSTERROR_ABNORMAL_SHUTDOWN;
+                                            }
+                                            digitalWrite(PIN_CAMERA_WEN, LOW);
+                                            if (error == TSTERROR_OK) {
+                                                if ((error = transfer(s_standby, lengthof(s_standby))) == TSTERROR_OK) {
+                                                    reset();
+                                                    for (y = 0, j = 0; y < height; ++y) {
+                                                        for (x = 0; x < width; ++x) {
+                                                            for (i = 0; i < depth; ++i) {
+                                                                if (_morikawa->hasAbnormalShutdown()) {
+                                                                    error = TSTERROR_ABNORMAL_SHUTDOWN;
+                                                                    break;
+                                                                }
+                                                                temp[j] = read();
+                                                                if (++j >= lengthof(temp)) {
+                                                                    if ((error = (_morikawa->*s_write[storage])(address, temp, j, NULL)) == TSTERROR_OK) {
+                                                                        address += j;
+                                                                    }
+                                                                    else {
                                                                         break;
                                                                     }
-                                                                    temp[j] = read();
-                                                                    if (++j >= lengthof(temp)) {
-                                                                        if ((error = (_morikawa->*s_write[storage])(address, temp, j, NULL)) == TSTERROR_OK) {
-                                                                            address += j;
-                                                                        }
-                                                                        else {
-                                                                            break;
-                                                                        }
-                                                                        j = 0;
-                                                                    }
-                                                                }
-                                                                if (error != TSTERROR_OK) {
-                                                                    break;
+                                                                    j = 0;
                                                                 }
                                                             }
                                                             if (error != TSTERROR_OK) {
                                                                 break;
                                                             }
                                                         }
-                                                        if (error == TSTERROR_OK) {
-                                                            if ((error = (_morikawa->*s_write[storage])(address, temp, j, NULL)) == TSTERROR_OK) {
-                                                                *result = total;
-                                                            }
+                                                        if (error != TSTERROR_OK) {
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (error == TSTERROR_OK) {
+                                                        if ((error = (_morikawa->*s_write[storage])(address, temp, j, NULL)) == TSTERROR_OK) {
+                                                            *result = total;
                                                         }
                                                     }
                                                 }
@@ -507,12 +507,12 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     TSTMorikawa::saveMemoryLog();
 #endif
     digitalWrite(PIN_CAMERA_POWER, HIGH);
-    delay(BOOT_DELAY);
     digitalWrite(PIN_CAMERA_WEN, LOW);
     digitalWrite(PIN_CAMERA_RRST, HIGH);
     digitalWrite(PIN_CAMERA_OE, HIGH);
     digitalWrite(PIN_CAMERA_RCLK, LOW);
     digitalWrite(PIN_CAMERA_OE, LOW);
+    delay(BOOT_DELAY);
     return;
 }
 
@@ -533,6 +533,7 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
 #endif
     digitalWrite(PIN_CAMERA_RRST, LOW);
     digitalWrite(PIN_CAMERA_RCLK, HIGH);
+    delayMicroseconds(1);
     digitalWrite(PIN_CAMERA_RCLK, LOW);
     digitalWrite(PIN_CAMERA_RRST, HIGH);
     return;
@@ -546,6 +547,7 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     TSTMorikawa::saveMemoryLog();
 #endif
     digitalWrite(PIN_CAMERA_RCLK, HIGH);
+    delayMicroseconds(1);
     digitalWrite(PIN_CAMERA_RCLK, LOW);
     return result;
 }
