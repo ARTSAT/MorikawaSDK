@@ -1,7 +1,7 @@
 /*
 **      ARTSAT MorikawaSDK
 **
-**      Original Copyright (C) 2013 - 2013 HORIGUCHI Junshi.
+**      Original Copyright (C) 2013 - 2014 HORIGUCHI Junshi.
 **                                          http://iridium.jp/
 **                                          zap00365@nifty.com
 **      Portions Copyright (C) <year> <author>
@@ -232,13 +232,13 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     };
     static RegisterRec const s_RAW_VGA[] PROGMEM = {        // RAW VGA (640x480 1byte/pixel)
         {0x12, 0x01},   // COM7
-        {0x0C, 0x00},	// COM3
-        {0x3E, 0x00},	// COM14
+        {0x0C, 0x00},   // COM3
+        {0x3E, 0x00},   // COM14
         {0x70, 0x3A},   // SCALING_XSC
         {0x71, 0x35},   // SCALING_YSC
         {0x72, 0x11},   // SCALING_DCWCTR
         {0x73, 0xF0},   // SCALING_PCLK_DIV
-        {0xA2, 0x02},	// SCALING_PCLK_DELAY
+        {0xA2, 0x02},   // SCALING_PCLK_DELAY
         {0x17, 0x13},   // HSTART
         {0x18, 0x01},   // HSTOP
         {0x19, 0x02},   // VSTART
@@ -248,13 +248,13 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     };
     static RegisterRec const s_RAW_QVGA[] PROGMEM = {       // RAW QVGA (320x240 1byte/pixel)
         {0x12, 0x11},   // COM7
-        {0x0C, 0x04},	// COM3
-        {0x3E, 0x1A},	// COM14
+        {0x0C, 0x04},   // COM3
+        {0x3E, 0x1A},   // COM14
         {0x70, 0x3A},   // SCALING_XSC
         {0x71, 0x35},   // SCALING_YSC
         {0x72, 0x11},   // SCALING_DCWCTR
         {0x73, 0xF9},   // SCALING_PCLK_DIV
-        {0xA2, 0x02},	// SCALING_PCLK_DELAY
+        {0xA2, 0x02},   // SCALING_PCLK_DELAY
         {0x17, 0x16},   // HSTART
         {0x18, 0x04},   // HSTOP
         {0x19, 0x02},   // VSTART
@@ -265,12 +265,12 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     static RegisterRec const s_RAW_QCIF[] PROGMEM = {       // RAW QCIF (176x144 1byte/pixel)
         {0x12, 0x0D},   // COM7 0d
         {0x0C, 0x0C},   // COM3: scaling on
-        {0x3E, 0x1A},	// COM14
+        {0x3E, 0x1A},   // COM14
         {0x70, 0x3A},   // SCALING_XSC
         {0x71, 0x35},   // SCALING_YSC
         {0x72, 0x11},   // SCALING_DCWCTR
         {0x73, 0xF9},   // SCALING_PCLK_DIV
-        {0xA2, 0x52},	// SCALING_PCLK_DELAY
+        {0xA2, 0x52},   // SCALING_PCLK_DELAY
         {0x17, 0x39},   // HSTART
         {0x18, 0x03},   // HSTOP
         {0x19, 0x03},   // VSTART
@@ -280,13 +280,13 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     };
     static RegisterRec const s_RGB565_QVGA[] PROGMEM = {    // RGB565 QVGA (320x240 2byte/pixel)
         {0x12, 0x04},   // COM7
-        {0x0C, 0x04},	// COM3
-        {0x3E, 0x19},	// COM14
+        {0x0C, 0x04},   // COM3
+        {0x3E, 0x19},   // COM14
         {0x70, 0x3A},   // SCALING_XSC
         {0x71, 0x35},   // SCALING_YSC
         {0x72, 0x11},   // SCALING_DCWCTR
         {0x73, 0xF1},   // SCALING_PCLK_DIV
-        {0xA2, 0x02},	// SCALING_PCLK_DELAY
+        {0xA2, 0x02},   // SCALING_PCLK_DELAY
         {0x17, 0x16},   // HSTART
         {0x18, 0x04},   // HSTOP
         {0x19, 0x02},   // VSTART
@@ -296,13 +296,13 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     };
     static RegisterRec const s_RGB565_QQVGA[] PROGMEM = {   // RGB565 QQVGA (160x120 2byte/pixel)
         {0x12, 0x04},   // COM7
-        {0x0C, 0x04},	// COM3
-        {0x3E, 0x1A},	// COM14
+        {0x0C, 0x04},   // COM3
+        {0x3E, 0x1A},   // COM14
         {0x70, 0x3A},   // SCALING_XSC
         {0x71, 0x35},   // SCALING_YSC
         {0x72, 0x22},   // SCALING_DCWCTR
         {0x73, 0xF2},   // SCALING_PCLK_DIV
-        {0xA2, 0x02},	// SCALING_PCLK_DELAY
+        {0xA2, 0x02},   // SCALING_PCLK_DELAY
         {0x17, 0x16},   // HSTART
         {0x18, 0x04},   // HSTOP
         {0x19, 0x02},   // VSTART
@@ -312,13 +312,13 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     };
     static RegisterRec const s_RGB565_QQCIF[] PROGMEM = {   // RGB565 QQCIF (88x72 2byte/pixel)
         {0x12, 0x04},   // COM7
-        {0x0C, 0x0C},	// COM3
-        {0x3E, 0x12},	// COM14
+        {0x0C, 0x0C},   // COM3
+        {0x3E, 0x12},   // COM14
         {0x70, 0x3A},   // SCALING_XSC
         {0x71, 0x35},   // SCALING_YSC
         {0x72, 0x22},   // SCALING_DCWCTR down sample by 4
         {0x73, 0xF2},   // SCALING_PCLK_DIV F2 = DSP clock div by 4
-        {0xA2, 0x2A},	// SCALING_PCLK_DELAY
+        {0xA2, 0x2A},   // SCALING_PCLK_DELAY
         {0x17, 0x16},   // HSTART
         {0x18, 0x04},   // HSTOP
         {0x19, 0x02},   // VSTART
@@ -328,13 +328,13 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     };
     static RegisterRec const s_YUV422_QVGA[] PROGMEM = {       // YUV QVGA (320x240 2byte/pixel)
         {0x12, 0x00},   // COM7
-        {0x0C, 0x0C},	// COM3
-        {0x3E, 0x19},	// COM14
+        {0x0C, 0x0C},   // COM3
+        {0x3E, 0x19},   // COM14
         {0x70, 0x3A},   // SCALING_XSC
         {0x71, 0x35},   // SCALING_YSC
         {0x72, 0x11},   // SCALING_DCWCTR
         {0x73, 0xF1},   // SCALING_PCLK_DIV
-        {0xA2, 0x02},	// SCALING_PCLK_DELAY
+        {0xA2, 0x02},   // SCALING_PCLK_DELAY
         {0x17, 0x16},   // HSTART
         {0x18, 0x04},   // HSTOP
         {0x19, 0x02},   // VSTART
@@ -344,13 +344,13 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     };
     static RegisterRec const s_YUV422_QQVGA[] PROGMEM = {      // YUV QQVGA (160x120 2byte/pixel)
         {0x12, 0x00},   // COM7
-        {0x0C, 0x04},	// COM3
-        {0x3E, 0x1A},	// COM14
+        {0x0C, 0x04},   // COM3
+        {0x3E, 0x1A},   // COM14
         {0x70, 0x3A},   // SCALING_XSC
         {0x71, 0x35},   // SCALING_YSC
         {0x72, 0x22},   // SCALING_DCWCTR
         {0x73, 0xF2},   // SCALING_PCLK_DIV
-        {0xA2, 0x02},	// SCALING_PCLK_DELAY
+        {0xA2, 0x02},   // SCALING_PCLK_DELAY
         {0x17, 0x16},   // HSTART
         {0x18, 0x04},   // HSTOP
         {0x19, 0x02},   // VSTART
@@ -360,13 +360,13 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     };
     static RegisterRec const s_YUV422_QQCIF[] PROGMEM = {      // YUV QQCIF (88x72 2byte/pixel)
         {0x12, 0x00},   // COM7
-        {0x0C, 0x0C},	// COM3
-        {0x3E, 0x12},	// COM14
+        {0x0C, 0x0C},   // COM3
+        {0x3E, 0x12},   // COM14
         {0x70, 0x3A},   // SCALING_XSC
         {0x71, 0x35},   // SCALING_YSC
         {0x72, 0x22},   // SCALING_DCWCTR down sample by 4
         {0x73, 0xF2},   // SCALING_PCLK_DIV F2 = DSP clock div by 4
-        {0xA2, 0x2A},	// SCALING_PCLK_DELAY
+        {0xA2, 0x2A},   // SCALING_PCLK_DELAY
         {0x17, 0x16},   // HSTART
         {0x18, 0x04},   // HSTOP
         {0x19, 0x02},   // VSTART

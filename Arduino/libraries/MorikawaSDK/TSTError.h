@@ -10,7 +10,7 @@
 **                                          shinkoko43@gmail.com
 **      Portions Copyright (C) 2012 - 2013 TOKITAKE Yuta.
 **                                          toki211@gmail.com
-**      Portions Copyright (C) 2013 - 2013 HORIGUCHI Junshi.
+**      Portions Copyright (C) 2013 - 2014 HORIGUCHI Junshi.
 **                                          http://iridium.jp/
 **                                          zap00365@nifty.com
 **      Portions Copyright (C) <year> <author>
