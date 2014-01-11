@@ -388,10 +388,14 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     static unsigned long (*const s_getSize[STORAGE_LIMIT])(void) = {
         NULL, &TSTMorikawa::getSizeSharedMemory, &TSTMorikawa::getSizeFRAM, &TSTMorikawa::getSizeFlashROM
     };
+    static unsigned int (*const s_getPageSize[STORAGE_LIMIT])(void) = {
+        NULL, &TSTMorikawa::getPageSizeSharedMemory, &TSTMorikawa::getPageSizeFRAM, &TSTMorikawa::getPageSizeFlashROM
+    };
     static TSTError (TSTMorikawa::*const s_write[STORAGE_LIMIT])(unsigned long, void const*, unsigned int, unsigned int*) = {
         NULL, &TSTMorikawa::writeSharedMemory, &TSTMorikawa::writeFRAM, &TSTMorikawa::writeFlashROM
     };
-    unsigned char temp[128];
+    unsigned char temp[256];
+    register unsigned int page;
     register int width;
     register int height;
     register int depth;
@@ -408,63 +412,65 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     if ((0 <= mode && mode < CAMERA_LIMIT) && result != NULL) {
         if (STORAGE_NONE < storage && storage < STORAGE_LIMIT) {
             if (address + size <= (*s_getSize[storage])()) {
-                width = pgm_read_word(&g_format[mode].width);
-                height = pgm_read_word(&g_format[mode].height);
-                depth = pgm_read_byte(&g_format[mode].depth);
-                total = static_cast<unsigned long>(width) * height * depth;
-                if (size >= total) {
-                    if (_morikawa != NULL) {
-                        if (!_morikawa->hasAbnormalShutdown()) {
-                            wake();
-                            reset();
-                            for (i = 0; i < 128; ++i) {
-                                if (_morikawa->hasAbnormalShutdown()) {
-                                    error = TSTERROR_ABNORMAL_SHUTDOWN;
-                                    break;
+                if ((page = (*s_getPageSize[storage])()) <= sizeof(temp)) {
+                    width = pgm_read_word(&g_format[mode].width);
+                    height = pgm_read_word(&g_format[mode].height);
+                    depth = pgm_read_byte(&g_format[mode].depth);
+                    total = static_cast<unsigned long>(width) * height * depth;
+                    if (size >= total) {
+                        if (_morikawa != NULL) {
+                            if (!_morikawa->hasAbnormalShutdown()) {
+                                wake();
+                                reset();
+                                for (i = 0; i < 128; ++i) {
+                                    if (_morikawa->hasAbnormalShutdown()) {
+                                        error = TSTERROR_ABNORMAL_SHUTDOWN;
+                                        break;
+                                    }
+                                    read();
                                 }
-                                read();
-                            }
-                            if (error == TSTERROR_OK) {
-                                if ((error = transfer(s_initialize, lengthof(s_initialize))) == TSTERROR_OK) {
-                                    if ((error = transfer(reinterpret_cast<RegisterRec const PROGMEM*>(pgm_read_word(&s_mode[mode].data)), pgm_read_word(&s_mode[mode].length))) == TSTERROR_OK) {
-                                        if ((error = synchronize(true)) == TSTERROR_OK) {
-                                            digitalWrite(PIN_CAMERA_WEN, HIGH);
-                                            if ((error = synchronize(false)) == TSTERROR_OK) {
-                                                error = synchronize(true);
-                                            }
-                                            digitalWrite(PIN_CAMERA_WEN, LOW);
-                                            if (error == TSTERROR_OK) {
-                                                if ((error = transfer(s_standby, lengthof(s_standby))) == TSTERROR_OK) {
-                                                    reset();
-                                                    for (y = 0, j = 0; y < height; ++y) {
-                                                        for (x = 0; x < width; ++x) {
-                                                            for (i = 0; i < depth; ++i) {
-                                                                if (_morikawa->hasAbnormalShutdown()) {
-                                                                    error = TSTERROR_ABNORMAL_SHUTDOWN;
-                                                                    break;
-                                                                }
-                                                                temp[j] = read();
-                                                                if (++j >= lengthof(temp)) {
-                                                                    if ((error = (_morikawa->*s_write[storage])(address, temp, j, NULL)) == TSTERROR_OK) {
-                                                                        address += j;
-                                                                    }
-                                                                    else {
+                                if (error == TSTERROR_OK) {
+                                    if ((error = transfer(s_initialize, lengthof(s_initialize))) == TSTERROR_OK) {
+                                        if ((error = transfer(reinterpret_cast<RegisterRec const PROGMEM*>(pgm_read_word(&s_mode[mode].data)), pgm_read_word(&s_mode[mode].length))) == TSTERROR_OK) {
+                                            if ((error = synchronize(true)) == TSTERROR_OK) {
+                                                digitalWrite(PIN_CAMERA_WEN, HIGH);
+                                                if ((error = synchronize(false)) == TSTERROR_OK) {
+                                                    error = synchronize(true);
+                                                }
+                                                digitalWrite(PIN_CAMERA_WEN, LOW);
+                                                if (error == TSTERROR_OK) {
+                                                    if ((error = transfer(s_standby, lengthof(s_standby))) == TSTERROR_OK) {
+                                                        reset();
+                                                        for (y = 0, j = 0; y < height; ++y) {
+                                                            for (x = 0; x < width; ++x) {
+                                                                for (i = 0; i < depth; ++i) {
+                                                                    if (_morikawa->hasAbnormalShutdown()) {
+                                                                        error = TSTERROR_ABNORMAL_SHUTDOWN;
                                                                         break;
                                                                     }
-                                                                    j = 0;
+                                                                    temp[j] = read();
+                                                                    if (++j >= page) {
+                                                                        if ((error = (_morikawa->*s_write[storage])(address, temp, j, NULL)) == TSTERROR_OK) {
+                                                                            address += j;
+                                                                        }
+                                                                        else {
+                                                                            break;
+                                                                        }
+                                                                        j = 0;
+                                                                    }
+                                                                }
+                                                                if (error != TSTERROR_OK) {
+                                                                    break;
                                                                 }
                                                             }
                                                             if (error != TSTERROR_OK) {
                                                                 break;
                                                             }
                                                         }
-                                                        if (error != TSTERROR_OK) {
-                                                            break;
-                                                        }
-                                                    }
-                                                    if (error == TSTERROR_OK) {
-                                                        if ((error = (_morikawa->*s_write[storage])(address, temp, j, NULL)) == TSTERROR_OK) {
-                                                            *result = total;
+                                                        if (error == TSTERROR_OK) {
+                                                            if ((error = (_morikawa->*s_write[storage])(address, temp, j, NULL)) == TSTERROR_OK) {
+                                                                *result = total;
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -472,19 +478,22 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
                                         }
                                     }
                                 }
+                                sleep();
                             }
-                            sleep();
+                            else {
+                                error = TSTERROR_INVALID_STATE;
+                            }
                         }
                         else {
                             error = TSTERROR_INVALID_STATE;
                         }
                     }
                     else {
-                        error = TSTERROR_INVALID_STATE;
+                        error = TSTERROR_INVALID_PARAM;
                     }
                 }
                 else {
-                    error = TSTERROR_INVALID_PARAM;
+                    error = TSTERROR_INVALID_IMPLEMENT;
                 }
             }
             else {
