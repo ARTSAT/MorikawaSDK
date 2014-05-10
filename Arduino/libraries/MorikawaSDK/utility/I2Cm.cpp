@@ -40,8 +40,8 @@ static volatile uint8_t twi_slarw;
 static volatile uint8_t twi_sendStop;           // should the transaction end with a stop
 static volatile uint8_t twi_inRepStart;         // in the middle of a repeated start
 static uint8_t twi_masterBuffer[TWI_BUFFER_LENGTH];
-static volatile uint8_t twi_masterBufferIndex;
-static volatile uint8_t twi_masterBufferLength;
+static volatile int16_t twi_masterBufferIndex;
+static volatile int16_t twi_masterBufferLength;
 static volatile uint8_t twi_error;
 
 I2CmClass I2Cm;
