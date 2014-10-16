@@ -48,6 +48,7 @@
 
 namespace tst {
 
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
 #define ADDRESS_LIMIT       (0x80000UL)
 #define ADDRESS_BOOT        (0x7FF80UL)
 #define ADDRESS_SELFTESTLOG (0x7FF00UL)
@@ -63,6 +64,39 @@ namespace tst {
 #define SECTOR_SIZE         (static_cast<unsigned long>(PAGE_LIMIT) * PAGE_SIZE)
 #define PAGE_LIMIT          (512)
 #define PAGE_SIZE           (128)
+#elif defined(TARGET_DESPATCH_FM1)
+#define ADDRESS_LIMIT       (0x40000UL)
+#define ADDRESS_BOOT        (0x3FF80UL)
+#define ADDRESS_SELFTESTLOG (0x3FF00UL)
+#define ADDRESS_TEXT_X      (0x3FE80UL)
+#define ADDRESS_TEXT_Y      (0x3FE00UL)
+#define ADDRESS_TEXT_Z      (0x3FD80UL)
+#define ADDRESS_TEXT_DEBUG  (0x3FD00UL)
+#define ADDRESS_NOTE        (0x3FC00UL)
+#define ADDRESS_DIGITALKER  (0x3FB80UL)
+#define ADDRESS_MORSE       (0x3FB40UL)
+#define ADDRESS_CAMERA      (0x3FB00UL)
+#define SECTOR_LIMIT        (4)
+#define SECTOR_SIZE         (static_cast<unsigned long>(PAGE_LIMIT) * PAGE_SIZE)
+#define PAGE_LIMIT          (512)
+#define PAGE_SIZE           (128)
+#else
+#define ADDRESS_LIMIT       (0)
+#define ADDRESS_BOOT        (0)
+#define ADDRESS_SELFTESTLOG (0)
+#define ADDRESS_TEXT_X      (0)
+#define ADDRESS_TEXT_Y      (0)
+#define ADDRESS_TEXT_Z      (0)
+#define ADDRESS_TEXT_DEBUG  (0)
+#define ADDRESS_NOTE        (0)
+#define ADDRESS_DIGITALKER  (0)
+#define ADDRESS_MORSE       (0)
+#define ADDRESS_CAMERA      (0)
+#define SECTOR_LIMIT        (0)
+#define SECTOR_SIZE         (0)
+#define PAGE_LIMIT          (0)
+#define PAGE_SIZE           (0)
+#endif
 
 static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     ADDRESS_TEXT_X,
@@ -73,7 +107,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 
 /*public static */unsigned long TSTSharedMemory::getSize(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     return ADDRESS_CAMERA;
@@ -81,7 +115,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 
 /*public static */unsigned int TSTSharedMemory::getPageSize(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     return PAGE_SIZE;
@@ -89,7 +123,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 
 /*public static */unsigned long TSTSharedMemory::getSectorSize(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     return 0;
@@ -99,12 +133,14 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1) || defined(TARGET_DESPATCH_FM1)
     if (morikawa != NULL) {
         if (_morikawa == NULL) {
             _morikawa = morikawa;
+            pinMode(PIN_SHAREDMEMORY_STATE, INPUT);
         }
         else {
             error = TSTERROR_INVALID_STATE;
@@ -113,12 +149,15 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     else {
         error = TSTERROR_INVALID_PARAM;
     }
+#else
+    error = TSTERROR_NO_SUPPORT;
+#endif
     return error;
 }
 
 /*public */void TSTSharedMemory::cleanup(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -131,11 +170,13 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = checkGeneral(address, data, &size, result)) == TSTERROR_OK) {
-        error = writeGeneral(address, static_cast<unsigned char const*>(data), NULL, size);
+        if ((error = checkPermission()) == TSTERROR_OK) {
+            error = writeGeneral(address, static_cast<unsigned char const*>(data), NULL, size);
+        }
     }
     return error;
 }
@@ -144,11 +185,13 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = checkGeneral(address, data, &size, result)) == TSTERROR_OK) {
-        error = writeGeneral(address, NULL, static_cast<unsigned char const PROGMEM*>(data), size);
+        if ((error = checkPermission()) == TSTERROR_OK) {
+            error = writeGeneral(address, NULL, static_cast<unsigned char const PROGMEM*>(data), size);
+        }
     }
     return error;
 }
@@ -157,13 +200,15 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (sizeof(log) < ADDRESS_BOOT - ADDRESS_SELFTESTLOG) {
         if (_morikawa != NULL) {
             if (!_morikawa->hasAbnormalShutdown()) {
-                error = writeSpecial(ADDRESS_SELFTESTLOG, reinterpret_cast<unsigned char const*>(&log), NULL, sizeof(log));
+                if ((error = checkPermission()) == TSTERROR_OK) {
+                    error = writeSpecial(ADDRESS_SELFTESTLOG, reinterpret_cast<unsigned char const*>(&log), NULL, sizeof(log));
+                }
             }
             else {
                 error = TSTERROR_INVALID_STATE;
@@ -183,11 +228,13 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = checkText(index, text, NULL, &length)) == TSTERROR_OK) {
-        error = writeSpecial(pgm_read_dword(&g_text[index]), reinterpret_cast<unsigned char const*>(text), NULL, length);
+        if ((error = checkPermission()) == TSTERROR_OK) {
+            error = writeSpecial(pgm_read_dword(&g_text[index]), reinterpret_cast<unsigned char const*>(text), NULL, length);
+        }
     }
     return error;
 }
@@ -196,11 +243,13 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = checkText(index, NULL, text, &length)) == TSTERROR_OK) {
-        error = writeSpecial(pgm_read_dword(&g_text[index]), NULL, reinterpret_cast<unsigned char const PROGMEM*>(text), length);
+        if ((error = checkPermission()) == TSTERROR_OK) {
+            error = writeSpecial(pgm_read_dword(&g_text[index]), NULL, reinterpret_cast<unsigned char const PROGMEM*>(text), length);
+        }
     }
     return error;
 }
@@ -209,11 +258,13 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = checkGeneral(address, data, &size, result)) == TSTERROR_OK) {
-        error = readGeneral(address, static_cast<unsigned char*>(data), size);
+        if ((error = checkPermission()) == TSTERROR_OK) {
+            error = readGeneral(address, static_cast<unsigned char*>(data), size);
+        }
     }
     return error;
 }
@@ -225,35 +276,37 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     register int j;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = checkParam(result)) == TSTERROR_OK) {
-        for (i = 0; i < lengthof(temp); ++i) {
-            if ((error = readSpecial(ADDRESS_BOOT + sizeof(temp[i]) * i, reinterpret_cast<unsigned char*>(&temp[i]), sizeof(temp[i]))) == TSTERROR_OK) {
-                temp[i].time = ((temp[i].time & 0x000000FFUL) << 24) |
-                               ((temp[i].time & 0x0000FF00UL) <<  8) |
-                               ((temp[i].time & 0x00FF0000UL) >>  8) |
-                               ((temp[i].time & 0xFF000000UL) >> 24);
-            }
-            else {
-                break;
-            }
-        }
-        if (error == TSTERROR_OK) {
-            result->time = 0;
-            result->count = 1;
-            result->mode = 0;
+        if ((error = checkPermission()) == TSTERROR_OK) {
             for (i = 0; i < lengthof(temp); ++i) {
-                j = (i + 1) % lengthof(temp);
-                if (temp[i].time == temp[j].time) {
-                    result->time = temp[i].time;
+                if ((error = readSpecial(ADDRESS_BOOT + sizeof(temp[i]) * i, reinterpret_cast<unsigned char*>(&temp[i]), sizeof(temp[i]))) == TSTERROR_OK) {
+                    temp[i].time = ((temp[i].time & 0x000000FFUL) << 24) |
+                    ((temp[i].time & 0x0000FF00UL) <<  8) |
+                    ((temp[i].time & 0x00FF0000UL) >>  8) |
+                    ((temp[i].time & 0xFF000000UL) >> 24);
                 }
-                if (temp[i].count == temp[j].count) {
-                    result->count = temp[i].count;
+                else {
+                    break;
                 }
-                if (temp[i].mode == temp[j].mode) {
-                    result->mode = temp[i].mode;
+            }
+            if (error == TSTERROR_OK) {
+                result->time = 0;
+                result->count = 1;
+                result->mode = 0;
+                for (i = 0; i < lengthof(temp); ++i) {
+                    j = (i + 1) % lengthof(temp);
+                    if (temp[i].time == temp[j].time) {
+                        result->time = temp[i].time;
+                    }
+                    if (temp[i].count == temp[j].count) {
+                        result->count = temp[i].count;
+                    }
+                    if (temp[i].mode == temp[j].mode) {
+                        result->mode = temp[i].mode;
+                    }
                 }
             }
         }
@@ -267,26 +320,28 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     unsigned char temp;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = checkText(index)) == TSTERROR_OK) {
-        address = pgm_read_dword(&g_text[index]);
-        if ((error = readSpecial(address, &temp, sizeof(temp))) == TSTERROR_OK) {
-            if (temp < PAGE_SIZE) {
-                ++temp;
-                if (text != NULL && length > 0) {
-                    length = min(length, temp) - 1;
-                    if ((error = readSpecial(address + sizeof(temp), reinterpret_cast<unsigned char*>(text), length)) == TSTERROR_OK) {
-                        text[length] = '\0';
+        if ((error = checkPermission()) == TSTERROR_OK) {
+            address = pgm_read_dword(&g_text[index]);
+            if ((error = readSpecial(address, &temp, sizeof(temp))) == TSTERROR_OK) {
+                if (temp < PAGE_SIZE) {
+                    ++temp;
+                    if (text != NULL && length > 0) {
+                        length = min(length, temp) - 1;
+                        if ((error = readSpecial(address + sizeof(temp), reinterpret_cast<unsigned char*>(text), length)) == TSTERROR_OK) {
+                            text[length] = '\0';
+                        }
+                    }
+                    if (result != NULL) {
+                        *result = temp;
                     }
                 }
-                if (result != NULL) {
-                    *result = temp;
+                else {
+                    error = TSTERROR_FAILED;
                 }
-            }
-            else {
-                error = TSTERROR_FAILED;
             }
         }
     }
@@ -297,11 +352,13 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = checkParam(result)) == TSTERROR_OK) {
-        error = readParam(ADDRESS_NOTE, result->data, sizeof(result->data), &result->size);
+        if ((error = checkPermission()) == TSTERROR_OK) {
+            error = readParam(ADDRESS_NOTE, result->data, sizeof(result->data), &result->size);
+        }
     }
     return error;
 }
@@ -310,11 +367,13 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = checkParam(result)) == TSTERROR_OK) {
-        error = readParam(ADDRESS_MORSE, result->data, sizeof(result->data), &result->size);
+        if ((error = checkPermission()) == TSTERROR_OK) {
+            error = readParam(ADDRESS_MORSE, result->data, sizeof(result->data), &result->size);
+        }
     }
     return error;
 }
@@ -323,11 +382,13 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = checkParam(result)) == TSTERROR_OK) {
-        error = readParam(ADDRESS_DIGITALKER, result->data, sizeof(result->data), &result->size);
+        if ((error = checkPermission()) == TSTERROR_OK) {
+            error = readParam(ADDRESS_DIGITALKER, result->data, sizeof(result->data), &result->size);
+        }
     }
     return error;
 }
@@ -336,11 +397,13 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = checkParam(result)) == TSTERROR_OK) {
-        error = readParam(ADDRESS_CAMERA, result->data, sizeof(result->data), &result->size);
+        if ((error = checkPermission()) == TSTERROR_OK) {
+            error = readParam(ADDRESS_CAMERA, result->data, sizeof(result->data), &result->size);
+        }
     }
     return error;
 }
@@ -352,22 +415,24 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     register unsigned int i;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
         if (!_morikawa->hasAbnormalShutdown()) {
-            for (address = 0; address < ADDRESS_CAMERA; ) {
-                if (_morikawa->hasAbnormalShutdown()) {
-                    error = TSTERROR_ABNORMAL_SHUTDOWN;
-                    break;
-                }
-                i2c = control(address);
-                for (i = 0; i < PAGE_SIZE; ++i, ++address) {
-                    I2Cm.write(0xFF);
-                }
-                if ((error = send(i2c, true)) != TSTERROR_OK) {
-                    break;
+            if ((error = checkPermission()) == TSTERROR_OK) {
+                for (address = 0; address < ADDRESS_CAMERA; ) {
+                    if (_morikawa->hasAbnormalShutdown()) {
+                        error = TSTERROR_ABNORMAL_SHUTDOWN;
+                        break;
+                    }
+                    i2c = control(address);
+                    for (i = 0; i < PAGE_SIZE; ++i, ++address) {
+                        I2Cm.write(0xFF);
+                    }
+                    if ((error = send(i2c, true)) != TSTERROR_OK) {
+                        break;
+                    }
                 }
             }
         }
@@ -385,7 +450,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = checkParam(data)) == TSTERROR_OK) {
@@ -415,7 +480,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (data != NULL) {
@@ -438,7 +503,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (ram != NULL || rom != NULL) {
@@ -461,7 +526,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (0 <= index && index < TEXT_LIMIT) {
@@ -480,6 +545,21 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     return error;
 }
 
+/*private static */TSTError TSTSharedMemory::checkPermission(void)
+{
+    TSTError error(TSTERROR_OK);
+    
+#if defined(OPTION_BUILD_MEMORYLOG)
+    TSTMorikawa::saveMemoryLog();
+#endif
+#if defined(TARGET_DESPATCH_FM1)
+    if (digitalRead(PIN_SHAREDMEMORY_STATE) != HIGH) {
+        error = TSTERROR_INVALID_PERMISSION;
+    }
+#endif
+    return error;
+}
+
 /*private */TSTError TSTSharedMemory::writeGeneral(unsigned long address, unsigned char const* ram, unsigned char const PROGMEM* rom, unsigned int size)
 {
     register unsigned int pb;
@@ -489,7 +569,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     register unsigned int i;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (size > 0) {
@@ -519,7 +599,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 
 /*private */TSTError TSTSharedMemory::writeSpecial(unsigned long address, unsigned char const* ram, unsigned char const PROGMEM* rom, unsigned int size)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     return writePage(address, &ram, &rom, size);
@@ -530,7 +610,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     register int i2c;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     for (; size > 0; --size, ++address) {
@@ -560,7 +640,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     register unsigned int i;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (!_morikawa->hasAbnormalShutdown()) {
@@ -589,7 +669,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     register unsigned int i;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (!_morikawa->hasAbnormalShutdown()) {
@@ -625,7 +705,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     register unsigned int i;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (size > 0) {
@@ -653,7 +733,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     unsigned char temp;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = readSpecial(address, &temp, sizeof(temp))) == TSTERROR_OK) {
@@ -671,7 +751,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 
 /*private */TSTError TSTSharedMemory::readSpecial(unsigned long address, unsigned char* data, unsigned int size)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     return readSequence(address, &data, size);
@@ -682,7 +762,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
     register int i2c;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     i2c = control(address);
@@ -714,6 +794,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 
 /*private static */unsigned char TSTSharedMemory::control(unsigned long address)
 {
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
     static unsigned char const s_address[SECTOR_LIMIT] PROGMEM = {
         0x50,
         0x54,
@@ -725,8 +806,19 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
         0x57
     };
     unsigned char result(pgm_read_byte(&s_address[(address >> 16) & 0x07]));
+#elif defined(TARGET_DESPATCH_FM1)
+    static unsigned char const s_address[SECTOR_LIMIT] PROGMEM = {
+        0x50,
+        0x54,
+        0x51,
+        0x55
+    };
+    unsigned char result(pgm_read_byte(&s_address[(address >> 16) & 0x03]));
+#else
+    unsigned char result(0);
+#endif
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     while (true) {
@@ -745,7 +837,7 @@ static unsigned long const g_text[TEXT_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (I2Cm.send(i2c, stop) != 0) {

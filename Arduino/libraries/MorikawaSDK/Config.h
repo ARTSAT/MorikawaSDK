@@ -1,7 +1,7 @@
 /*
 **      ARTSAT MorikawaSDK
 **
-**      Original Copyright (C) 2013 - 2014 HORIGUCHI Junshi.
+**      Original Copyright (C) 2014 - 2014 HORIGUCHI Junshi.
 **                                          http://iridium.jp/
 **                                          zap00365@nifty.com
 **      Portions Copyright (C) <year> <author>
@@ -16,7 +16,7 @@
 **      This source code is for Arduino IDE.
 **      Arduino 1.0.5
 **
-**      TSTLED.cpp
+**      Config.h
 **
 **      ------------------------------------------------------------------------
 **
@@ -42,100 +42,13 @@
 **      もし受け取っていなければ <http://www.gnu.org/licenses/> をご覧ください。
 */
 
-#include "TSTLED.h"
-#include "TSTMorikawa.h"
+#ifndef __CONFIG_H
+#define __CONFIG_H
 
-namespace tst {
+//#define TARGET_INVADER_EM1
+#define TARGET_INVADER_FM1
+//#define TARGET_DESPATCH_FM1
 
-static PinType const g_pin[LED_LIMIT] PROGMEM = {
-    PIN_LED_X,
-    PIN_LED_Y
-};
+#define OPTION_BUILD_MEMORYLOG
 
-/*public */TSTError TSTLED::set(LEDType index, unsigned char pwm)
-{
-    TSTError error(TSTERROR_OK);
-    
-#if defined(OPTION_BUILD_MEMORYLOG)
-    TSTMorikawa::saveMemoryLog();
 #endif
-    if (0 <= index && index < LED_LIMIT) {
-        if (_morikawa != NULL) {
-            analogWrite(pgm_read_byte(&g_pin[index]), pwm);
-            _pwm[index] = pwm;
-        }
-        else {
-            error = TSTERROR_INVALID_STATE;
-        }
-    }
-    else {
-        error = TSTERROR_INVALID_PARAM;
-    }
-    return error;
-}
-
-/*public */unsigned char TSTLED::get(LEDType index) const
-{
-    unsigned char result(0);
-    
-#if defined(OPTION_BUILD_MEMORYLOG)
-    TSTMorikawa::saveMemoryLog();
-#endif
-    if (0 <= index && index < LED_LIMIT) {
-        if (_morikawa != NULL) {
-            result = _pwm[index];
-        }
-    }
-    return result;
-}
-
-/*public */TSTError TSTLED::setup(TSTMorikawa* morikawa)
-{
-    register PinType pin;
-    register int i;
-    TSTError error(TSTERROR_OK);
-    
-#if defined(OPTION_BUILD_MEMORYLOG)
-    TSTMorikawa::saveMemoryLog();
-#endif
-#if defined(TARGET_INVADER_FM1)
-    if (morikawa != NULL) {
-        if (_morikawa == NULL) {
-            _morikawa = morikawa;
-            for (i = 0; i < LED_LIMIT; ++i) {
-                pin = pgm_read_byte(&g_pin[i]);
-                pinMode(pin, OUTPUT);
-                analogWrite(pin, 0);
-                _pwm[i] = 0;
-            }
-        }
-        else {
-            error = TSTERROR_INVALID_STATE;
-        }
-    }
-    else {
-        error = TSTERROR_INVALID_PARAM;
-    }
-#else
-    error = TSTERROR_NO_SUPPORT;
-#endif
-    return error;
-}
-
-/*public */void TSTLED::cleanup(void)
-{
-    register int i;
-    
-#if defined(OPTION_BUILD_MEMORYLOG)
-    TSTMorikawa::saveMemoryLog();
-#endif
-    if (_morikawa != NULL) {
-        for (i = 0; i < LED_LIMIT; ++i) {
-            analogWrite(pgm_read_byte(&g_pin[i]), 0);
-        }
-        _morikawa = NULL;
-    }
-    return;
-}
-
-}// end of namespace

@@ -59,8 +59,14 @@
 #include <stddef.h>
 #include <Arduino.h>
 
-#define TARGET_MORIKAWA_FM1
-#define OPTION_BUILD_MEMORYLOG
+#include "Config.h"
+
+#if defined(TARGET_DESPATCH_FM1)
+#undef TARGET_INVADER_EM1
+#undef TARGET_INVADER_FM1
+#elif defined(TARGET_INVADER_FM1)
+#undef TARGET_INVADER_EM1
+#endif
 
 namespace tst {
 
@@ -87,7 +93,11 @@ enum PinEnum {
     PIN_CAMERA_OE           = 45,
     PIN_CAMERA_RCLK         = 44,
     PIN_SCCB_SIOC           = 43,
-    PIN_SCCB_SIOD           = 42
+    PIN_SCCB_SIOD           = 42,
+    PIN_POWER_X             = 22,
+    PIN_POWER_Y             = 23,
+    PIN_POWER_Z             = 24,
+    PIN_SHAREDMEMORY_STATE  = 37
 };
 typedef unsigned char       PinType;
 enum StorageEnum {

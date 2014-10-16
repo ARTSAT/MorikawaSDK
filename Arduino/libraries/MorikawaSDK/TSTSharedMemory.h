@@ -117,6 +117,7 @@ class TSTSharedMemory {
                 TSTError            checkParam                  (void const* data) const;
                 TSTError            checkText                   (TextType index, char const* ram, char const PROGMEM* rom, int* length) const;
                 TSTError            checkText                   (TextType index) const;
+        static  TSTError            checkPermission             (void);
                 TSTError            writeGeneral                (unsigned long address, unsigned char const* ram, unsigned char const PROGMEM* rom, unsigned int size);
                 TSTError            writeSpecial                (unsigned long address, unsigned char const* ram, unsigned char const PROGMEM* rom, unsigned int size);
                 TSTError            writeByte                   (unsigned long address, unsigned char const** ram, unsigned char const PROGMEM** rom, unsigned int size);

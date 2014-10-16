@@ -53,11 +53,47 @@
 #define DO_FRAM_FORMAT_TEST
 #define DO_FLASHROM_FORMAT_TEST
 
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
+#define ADDRESS_BOOT            (0x7FF80UL)
+#define ADDRESS_TEXT_X          (0x7FE80UL)
+#define ADDRESS_TEXT_Y          (0x7FE00UL)
+#define ADDRESS_TEXT_Z          (0x7FD80UL)
+#define ADDRESS_TEXT_DEBUG      (0x7FD00UL)
+#define ADDRESS_NOTE            (0x7FC00UL)
+#define ADDRESS_DIGITALKER      (0x7FB80UL)
+#define ADDRESS_MORSE           (0x7FB40UL)
+#define ADDRESS_CAMERA          (0x7FB00UL)
+#define SECTOR_LIMIT            (8)
+#define SHAREDMEMORY_PAGE_SIZE  (128UL)
+#elif defined(TARGET_DESPATCH_FM1)
+#define ADDRESS_BOOT            (0x3FF80UL)
+#define ADDRESS_TEXT_X          (0x3FE80UL)
+#define ADDRESS_TEXT_Y          (0x3FE00UL)
+#define ADDRESS_TEXT_Z          (0x3FD80UL)
+#define ADDRESS_TEXT_DEBUG      (0x3FD00UL)
+#define ADDRESS_NOTE            (0x3FC00UL)
+#define ADDRESS_DIGITALKER      (0x3FB80UL)
+#define ADDRESS_MORSE           (0x3FB40UL)
+#define ADDRESS_CAMERA          (0x3FB00UL)
+#define SECTOR_LIMIT            (4)
+#define SHAREDMEMORY_PAGE_SIZE  (128UL)
+#else
+#define ADDRESS_BOOT            (0)
+#define ADDRESS_TEXT_X          (0)
+#define ADDRESS_TEXT_Y          (0)
+#define ADDRESS_TEXT_Z          (0)
+#define ADDRESS_TEXT_DEBUG      (0)
+#define ADDRESS_NOTE            (0)
+#define ADDRESS_DIGITALKER      (0)
+#define ADDRESS_MORSE           (0)
+#define ADDRESS_CAMERA          (0)
+#define SECTOR_LIMIT            (0)
+#define SHAREDMEMORY_PAGE_SIZE  (0)
+#endif
 #define EEPROM_SIZE             (EEPROM_FLASHROM)
-#define SHAREDMEMORY_SIZE       (0x7FB00UL)
+#define SHAREDMEMORY_SIZE       (ADDRESS_CAMERA)
 #define FRAM_SIZE               (0x20000UL)
 #define FLASHROM_SIZE           (0x100000UL)
-#define SHAREDMEMORY_PAGE_SIZE  (128UL)
 #define FLASHROM_PAGE_SIZE      (256UL)
 #define FLASHROM_SECTOR_SIZE    (65536UL)
 
@@ -190,7 +226,7 @@ void setup(void)
                 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10,
             };
             
-            writeSharedMemory(0x7FF80UL, data);
+            writeSharedMemory(ADDRESS_BOOT, data);
             
             pre("setup");
             error = Morikawa.setup();
@@ -369,7 +405,7 @@ void setup(void)
             NoteParam param;
             int i;
 
-            writeSharedMemory(0x7FC00UL, data);
+            writeSharedMemory(ADDRESS_NOTE, data);
             writeSharedMemory(0x7FC80UL, data2);
             
             pre("getParamNote");
@@ -406,7 +442,7 @@ void setup(void)
             MorseParam param;
             int i;
             
-            writeSharedMemory(0x7FB40UL, data);
+            writeSharedMemory(ADDRESS_MORSE, data);
             
             pre("getParamMorse");
             error = Morikawa.getParamMorse(NULL);
@@ -434,7 +470,7 @@ void setup(void)
             DigitalkerParam param;
             int i;
             
-            writeSharedMemory(0x7FB80UL, data);
+            writeSharedMemory(ADDRESS_DIGITALKER, data);
             
             pre("getParamDigitalker");
             error = Morikawa.getParamDigitalker(NULL);
@@ -462,7 +498,7 @@ void setup(void)
             CameraParam param;
             int i;
             
-            writeSharedMemory(0x7FB00UL, data);
+            writeSharedMemory(ADDRESS_CAMERA, data);
             
             pre("getParamCamera");
             error = Morikawa.getParamCamera(NULL);
@@ -925,15 +961,43 @@ void setup(void)
         // formatSharedMemory()
         {
 #ifdef DO_SHAREDMEMORY_FORMAT_TEST
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
+            static unsigned char const s_address[SECTOR_LIMIT] PROGMEM = {
+                0x50,
+                0x54,
+                0x51,
+                0x55,
+                0x52,
+                0x56,
+                0x53,
+                0x57
+            };
+#elif defined(TARGET_DESPATCH_FM1)
+            static unsigned char const s_address[SECTOR_LIMIT] PROGMEM = {
+                0x50,
+                0x54,
+                0x51,
+                0x55
+            };
+#else
+#endif
+            unsigned char i2c;
             unsigned long i;
             int j;
             
             pre("formatSharedMemory");
             error = TSTERROR_OK;
             for (i = 0; i < SHAREDMEMORY_SIZE; ) {
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
+                i2c = pgm_read_byte(&s_address[(i >> 16) & 0x07]);
+#elif defined(TARGET_DESPATCH_FM1)
+                i2c = pgm_read_byte(&s_address[(i >> 16) & 0x03]);
+#else
+                i2c = 0;
+#endif
                 while (true) {
                     I2Cm.clear();
-                    if (I2Cm.send(((i >> 16) & 0x07) + 0x50, true) == 0) {
+                    if (I2Cm.send(i2c, true) == 0) {
                         break;
                     }
                 }
@@ -943,7 +1007,7 @@ void setup(void)
                 for (j = 0; j < 128; ++j) {
                     I2Cm.write(0xBD);
                 }
-                if (I2Cm.send(((i >> 16) & 0x07) + 0x50, true) != 0) {
+                if (I2Cm.send(i2c, true) != 0) {
                     error = TSTERROR_FAILED;
                     break;
                 }
@@ -954,14 +1018,21 @@ void setup(void)
                 Morikawa.formatSharedMemory();
                 Serial.print(F("."));
                 for (i = 0; i < SHAREDMEMORY_SIZE; ) {
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
+                    i2c = pgm_read_byte(&s_address[(i >> 16) & 0x07]);
+#elif defined(TARGET_DESPATCH_FM1)
+                    i2c = pgm_read_byte(&s_address[(i >> 16) & 0x03]);
+#else
+                    i2c = 0;
+#endif
                     I2Cm.clear();
                     I2Cm.write((i >> 8) & 0xFF);
                     I2Cm.write((i >> 0) & 0xFF);
-                    if (I2Cm.send(((i >> 16) & 0x07) + 0x50, false) != 0) {
+                    if (I2Cm.send(i2c, false) != 0) {
                         error = TSTERROR_FAILED;
                         break;
                     }
-                    I2Cm.receive(((i >> 16) & 0x07) + 0x50, 1, true);
+                    I2Cm.receive(i2c, 1, true);
                     if (I2Cm.available() > 0) {
                         if (I2Cm.read() == 0xBD) {
                             error = TSTERROR_FAILED;
@@ -1988,11 +2059,34 @@ static void isValidTest(bool flag)
 
 static void writeSharedMemory(unsigned long address, unsigned char data[128])
 {
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
+    static unsigned char const s_address[SECTOR_LIMIT] PROGMEM = {
+        0x50,
+        0x54,
+        0x51,
+        0x55,
+        0x52,
+        0x56,
+        0x53,
+        0x57
+    };
+    unsigned char i2c(pgm_read_byte(&s_address[(address >> 16) & 0x07]));
+#elif defined(TARGET_DESPATCH_FM1)
+    static unsigned char const s_address[SECTOR_LIMIT] PROGMEM = {
+        0x50,
+        0x54,
+        0x51,
+        0x55
+    };
+    unsigned char i2c(pgm_read_byte(&s_address[(address >> 16) & 0x03]));
+#else
+    unsigned char i2c(0);
+#endif
     int i;
     
     while (true) {
         I2Cm.clear();
-        if (I2Cm.send(((address >> 16) & 0x07) + 0x50, true) == 0) {
+        if (I2Cm.send(i2c, true) == 0) {
             break;
         }
     }
@@ -2002,7 +2096,7 @@ static void writeSharedMemory(unsigned long address, unsigned char data[128])
     for (i = 0; i < 128; ++i) {
         I2Cm.write(data[i]);
     }
-    I2Cm.send(((address >> 16) & 0x07) + 0x50, true);
+    I2Cm.send(i2c, true);
     return;
 }
 

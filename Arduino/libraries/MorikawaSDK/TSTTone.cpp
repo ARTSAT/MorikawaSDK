@@ -56,7 +56,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -72,7 +72,7 @@ namespace tst {
 {
     int result(-1);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -85,7 +85,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -101,7 +101,7 @@ namespace tst {
 {
     int result(-1);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -114,9 +114,10 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
     if (morikawa != NULL) {
         if (_morikawa == NULL) {
             _morikawa = morikawa;
@@ -131,12 +132,15 @@ namespace tst {
     else {
         error = TSTERROR_INVALID_PARAM;
     }
+#else
+    error = TSTERROR_NO_SUPPORT;
+#endif
     return error;
 }
 
 /*public */void TSTTone::cleanup(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -150,7 +154,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -174,7 +178,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (sequence != NULL) {
@@ -190,7 +194,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (sequence != NULL) {
@@ -206,7 +210,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -230,7 +234,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (sequence != NULL) {
@@ -246,7 +250,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (sequence != NULL) {
@@ -262,7 +266,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -286,7 +290,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (sequence != NULL) {
@@ -302,7 +306,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (sequence != NULL) {
@@ -320,7 +324,7 @@ namespace tst {
     unsigned long duration;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -371,7 +375,7 @@ namespace tst {
     QualifierType qualifier;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -422,7 +426,7 @@ namespace tst {
     char character;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -466,7 +470,7 @@ namespace tst {
 
 /*private */void TSTTone::executeFrequency(FrequencyType frequency, unsigned long duration)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (duration > 0) {
@@ -485,7 +489,7 @@ namespace tst {
 {
     unsigned long time;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (duration > 0) {
@@ -625,7 +629,7 @@ namespace tst {
     unsigned int dash;
     register unsigned char bit;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     dot = 1200 / _wpm;

@@ -68,7 +68,7 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((0 <= mode && mode < CAMERA_LIMIT) && result != NULL) {
@@ -86,10 +86,10 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
-#ifdef TARGET_MORIKAWA_FM1
+#if defined(TARGET_INVADER_FM1)
     if (morikawa != NULL) {
         if (_morikawa == NULL) {
             _morikawa = morikawa;
@@ -122,7 +122,7 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
 
 /*public */void TSTCamera::cleanup(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -406,7 +406,7 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     register int j;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((0 <= mode && mode < CAMERA_LIMIT) && result != NULL) {
@@ -512,7 +512,7 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
 
 /*private static */void TSTCamera::wake(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     digitalWrite(PIN_CAMERA_POWER, HIGH);
@@ -527,7 +527,7 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
 
 /*private static */void TSTCamera::sleep(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     digitalWrite(PIN_CAMERA_OE, HIGH);
@@ -537,7 +537,7 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
 
 /*private static */void TSTCamera::reset(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     digitalWrite(PIN_CAMERA_RRST, LOW);
@@ -552,7 +552,7 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
 {
     unsigned char result(PINC);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     digitalWrite(PIN_CAMERA_RCLK, HIGH);
@@ -566,7 +566,7 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
     register unsigned char value;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     value = (state) ? (HIGH) : (LOW);
@@ -583,7 +583,7 @@ static CameraFormat const g_format[CAMERA_LIMIT] PROGMEM = {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     for (; length > 0; --length, ++data) {

@@ -59,7 +59,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -75,7 +75,7 @@ namespace tst {
 {
     bool result(false);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -88,7 +88,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -135,9 +135,10 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
     if (morikawa != NULL) {
         if (_morikawa == NULL) {
             _morikawa = morikawa;
@@ -155,12 +156,15 @@ namespace tst {
     else {
         error = TSTERROR_INVALID_PARAM;
     }
+#else
+    error = TSTERROR_NO_SUPPORT;
+#endif
     return error;
 }
 
 /*public */void TSTDigitalker::cleanup(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -174,7 +178,7 @@ namespace tst {
 {
     bool busy;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -194,7 +198,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (phrase != NULL) {
@@ -210,7 +214,7 @@ namespace tst {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (phrase != NULL) {
@@ -227,7 +231,7 @@ namespace tst {
     bool busy;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     while ((error = isBusy(&busy)) == TSTERROR_OK) {
@@ -247,7 +251,7 @@ namespace tst {
     bool busy;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -274,7 +278,7 @@ namespace tst {
     register int i;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (length < 0) {
@@ -338,7 +342,7 @@ namespace tst {
 
 /*private */void TSTDigitalker::wake(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (!_wake) {
@@ -351,7 +355,7 @@ namespace tst {
 
 /*private */void TSTDigitalker::sleep(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_wake) {

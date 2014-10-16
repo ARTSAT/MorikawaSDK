@@ -20,7 +20,7 @@
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
   
-  $Id$
+  $Id: WMath.cpp,v 1.1 2013/11/29 17:05:39 administrator Exp $
 */
 
 extern "C" {

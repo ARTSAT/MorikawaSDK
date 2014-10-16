@@ -50,7 +50,11 @@
 
 namespace tst {
 
+#if defined(TARGET_INVADER_FM1) || defined(TARGET_DESPATCH_FM1)
 #define ADDRESS_LIMIT       (0x20000UL)
+#else
+#define ADDRESS_LIMIT       (0)
+#endif
 #define WAKE_DELAY          (500)
 #define SLEEP_DELAY         (5)
 
@@ -72,19 +76,15 @@ enum StatusEnum {
 
 /*public static */unsigned long TSTFRAM::getSize(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
-#ifdef TARGET_MORIKAWA_FM1
     return ADDRESS_LIMIT;
-#else
-    return 0;
-#endif
 }
 
 /*public static */unsigned int TSTFRAM::getPageSize(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     return 0;
@@ -92,7 +92,7 @@ enum StatusEnum {
 
 /*public static */unsigned long TSTFRAM::getSectorSize(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     return 0;
@@ -102,10 +102,10 @@ enum StatusEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
-#ifdef TARGET_MORIKAWA_FM1
+#if defined(TARGET_INVADER_FM1) || defined(TARGET_DESPATCH_FM1)
     if (morikawa != NULL) {
         if (_morikawa == NULL) {
             _morikawa = morikawa;
@@ -126,7 +126,7 @@ enum StatusEnum {
 
 /*public */void TSTFRAM::cleanup(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -140,7 +140,7 @@ enum StatusEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = check(address, data, &size, result)) == TSTERROR_OK) {
@@ -153,7 +153,7 @@ enum StatusEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = check(address, data, &size, result)) == TSTERROR_OK) {
@@ -166,7 +166,7 @@ enum StatusEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = check(address, data, &size, result)) == TSTERROR_OK) {
@@ -180,10 +180,9 @@ enum StatusEnum {
     register unsigned long address;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
-#ifdef TARGET_MORIKAWA_FM1
     if (_morikawa != NULL) {
         if (!_morikawa->hasAbnormalShutdown()) {
             executeCommand(COMMAND_WREN);
@@ -205,15 +204,12 @@ enum StatusEnum {
     else {
         error = TSTERROR_INVALID_STATE;
     }
-#else
-    error = TSTERROR_NO_SUPPORT;
-#endif
     return error;
 }
 
 /*private static */void TSTFRAM::open(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     pinMode(PIN_FRAM_CS, OUTPUT);
@@ -227,7 +223,7 @@ enum StatusEnum {
 
 /*private static */void TSTFRAM::close(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     executeCommand(COMMAND_SLEEP);
@@ -240,7 +236,7 @@ enum StatusEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (data != NULL) {
@@ -283,7 +279,7 @@ enum StatusEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (size > 0) {
@@ -317,7 +313,7 @@ enum StatusEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (size > 0) {
@@ -337,7 +333,7 @@ enum StatusEnum {
 
 /*private static */void TSTFRAM::executeCommand(unsigned char command)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     beginTransfer(command);
@@ -347,7 +343,7 @@ enum StatusEnum {
 
 /*private static */void TSTFRAM::beginTransfer(unsigned char command)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     digitalWrite(PIN_FRAM_CS, LOW);
@@ -357,7 +353,7 @@ enum StatusEnum {
 
 /*private static */void TSTFRAM::endTransfer(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     digitalWrite(PIN_FRAM_CS, HIGH);
@@ -367,7 +363,7 @@ enum StatusEnum {
 
 /*private static */void TSTFRAM::transferAddress(unsigned long address)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     SPI.transfer((address >> 16) & 0x01);

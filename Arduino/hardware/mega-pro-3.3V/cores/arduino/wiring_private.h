@@ -19,7 +19,7 @@
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
 
-  $Id: wiring.h 239 2007-01-12 17:58:39Z mellis $
+  $Id: wiring_private.h,v 1.1 2013/11/29 17:05:39 administrator Exp $
 */
 
 #ifndef WiringPrivate_h

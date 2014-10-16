@@ -107,7 +107,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 {
     static TSTMorikawa s_singleton;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     return s_singleton;
@@ -118,7 +118,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     TSTCriticalSection mutex;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (result != NULL) {
@@ -177,7 +177,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     TSTCriticalSection mutex;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (result != NULL) {
@@ -220,7 +220,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     register unsigned int address;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (sizeof(*result) <= EEPROM_LIMIT - EEPROM_SELFTEST) {
@@ -246,7 +246,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     TSTCriticalSection mutex;
     register unsigned int address;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     mutex.lock();
@@ -259,7 +259,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 
 /*public static */unsigned long TSTMorikawa::getSizeEEPROM(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     return EEPROM_FLASHROM;
@@ -267,7 +267,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 
 /*public static */unsigned int TSTMorikawa::getPageSizeEEPROM(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     return 0;
@@ -275,7 +275,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 
 /*public static */unsigned long TSTMorikawa::getSectorSizeEEPROM(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     return 0;
@@ -285,7 +285,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 {
     unsigned long result(0);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (_state) {
@@ -298,7 +298,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 {
     unsigned char result(0);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (_state) {
@@ -311,7 +311,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 {
     unsigned char result(0);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (_state) {
@@ -325,7 +325,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkTelemetryTime(type, result, &rule)) == TSTERROR_OK) {
@@ -339,7 +339,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkTelemetryVoltage(type, result, &rule)) == TSTERROR_OK) {
@@ -353,7 +353,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkTelemetryVoltage(type, result, &rule)) == TSTERROR_OK) {
@@ -367,7 +367,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkTelemetryCurrent(type, result, &rule)) == TSTERROR_OK) {
@@ -381,7 +381,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkTelemetryCurrent(type, result, &rule)) == TSTERROR_OK) {
@@ -395,7 +395,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkTelemetryTemperature(type, result, &rule)) == TSTERROR_OK) {
@@ -409,7 +409,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkTelemetryTemperature(type, result, &rule)) == TSTERROR_OK) {
@@ -423,7 +423,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkTelemetryGyro(type, result, &rule)) == TSTERROR_OK) {
@@ -437,7 +437,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkTelemetryGyro(type, result, &rule)) == TSTERROR_OK) {
@@ -451,7 +451,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkTelemetryMagnet(type, result, &rule)) == TSTERROR_OK) {
@@ -465,7 +465,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     RuleRec const PROGMEM* rule;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkTelemetryMagnet(type, result, &rule)) == TSTERROR_OK) {
@@ -478,7 +478,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 {
     bool result(false);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (_state) {
@@ -491,7 +491,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 {
     bool result(false);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (_state) {
@@ -505,7 +505,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     TSTError log;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (!_state) {
@@ -521,6 +521,15 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
         _param.time = 0;
         _param.count = 1;
         _param.mode = 0;
+        pinMode(PIN_POWER_X, OUTPUT);
+        digitalWrite(PIN_POWER_X, LOW);
+        pinMode(PIN_POWER_Y, OUTPUT);
+        digitalWrite(PIN_POWER_Y, LOW);
+        pinMode(PIN_POWER_Z, OUTPUT);
+        digitalWrite(PIN_POWER_Z, LOW);
+#if defined(TARGET_DESPATCH_FM1)
+        digitalWrite(PIN_POWER_X, HIGH);
+#endif
         initializeI2C();
         initializeSPI();
         if ((log = _shared.setup(this)) != TSTERROR_OK) {
@@ -562,7 +571,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 
 /*public */void TSTMorikawa::cleanup(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (_state) {
@@ -586,7 +595,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 {
     TSTError log;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     getInstance().cleanup();
@@ -610,7 +619,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 {
     TSTCriticalSection mutex;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (_state) {
@@ -635,7 +644,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     register unsigned char const* temp;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkEEPROM(address, data, &size, result)) == TSTERROR_OK) {
@@ -651,7 +660,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     register unsigned char const PROGMEM* temp;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkEEPROM(address, data, &size, result)) == TSTERROR_OK) {
@@ -667,7 +676,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     register unsigned char* temp;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkEEPROM(address, data, &size, result)) == TSTERROR_OK) {
@@ -683,7 +692,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     register unsigned int address;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     for (address = 0; address < EEPROM_FLASHROM; ++address) {
@@ -697,7 +706,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     unsigned long size;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkFastLZ(istorage, iaddress, isize, ostorage, oaddress, osize, wstorage, waddress, wsize, result)) == TSTERROR_OK) {
@@ -725,7 +734,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     unsigned long size;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((error = checkFastLZ(istorage, iaddress, isize, ostorage, oaddress, osize, STORAGE_NONE, 0, 0, result)) == TSTERROR_OK) {
@@ -752,7 +761,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     TSTError log;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (_state) {
@@ -776,7 +785,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 {
     TSTError log;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (_state) {
@@ -795,7 +804,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 
 /*private static */void TSTMorikawa::initializeI2C(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     I2Cm.begin();
@@ -804,7 +813,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 
 /*private static */void TSTMorikawa::initializeSPI(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     SPI.begin();
@@ -838,7 +847,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     register PinType pin;
     register int i;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     seed = 0;
@@ -876,7 +885,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     SelfTestLog selftest;
     TSTError log;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     flag = false;
@@ -906,7 +915,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     };
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((0 <= type && type <= TIME_LIMIT) && result != NULL) {
@@ -932,7 +941,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     };
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((0 <= type && type <= VOLTAGE_LIMIT) && result != NULL) {
@@ -974,7 +983,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     };
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((0 <= type && type <= CURRENT_LIMIT) && result != NULL) {
@@ -1015,7 +1024,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     };
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((0 <= type && type <= TEMPERATURE_LIMIT) && result != NULL) {
@@ -1041,7 +1050,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     };
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((0 <= type && type <= GYRO_LIMIT) && result != NULL) {
@@ -1067,7 +1076,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     };
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if ((0 <= type && type <= MAGNET_LIMIT) && result != NULL) {
@@ -1089,7 +1098,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     TelemetryType index;
     unsigned char telemetry;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     index = pgm_read_byte(&rule->telemetry);
@@ -1134,7 +1143,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (data != NULL) {
@@ -1170,7 +1179,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     };
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     switch (istorage) {
@@ -1252,7 +1261,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 
 /*private static */TSTError TSTMorikawa::sendRequest(char to, char const PROGMEM* command)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     return sendPacket(PACKET_REQUEST, to, command);
@@ -1260,7 +1269,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 
 /*private static */TSTError TSTMorikawa::sendResponse(char to, char const PROGMEM* command)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     return sendPacket(PACKET_RESPONSE, to, command);
@@ -1275,7 +1284,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     register int j;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     for (i = 0, j = 0; i < asciiesof(g_send); ++i) {
@@ -1326,7 +1335,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     TWCR &= ~(_BV(TWIE) | _BV(TWINT));
     sei();
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     getInstance().onReceivePacket();
@@ -1346,7 +1355,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     register int i;
     register int j;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     while ((rx = Serial1.read()) >= 0) {
@@ -1420,7 +1429,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     TSTCriticalSection mutex;
     TSTError log;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     if (memcmp_P(packet.command, COMMAND_ECHO, lengthof(packet.command)) == 0) {
@@ -1459,7 +1468,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 
 /*private */void TSTMorikawa::onReceiveResponse(PacketRec const& packet)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
     return;

@@ -47,7 +47,7 @@
 
 void* operator new(size_t param)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     tst::TSTMorikawa::saveMemoryLog();
 #endif
     return malloc(param);
@@ -55,7 +55,7 @@ void* operator new(size_t param)
 
 void* operator new[](size_t param)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     tst::TSTMorikawa::saveMemoryLog();
 #endif
     return malloc(param);
@@ -63,7 +63,7 @@ void* operator new[](size_t param)
 
 void operator delete(void* param)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     tst::TSTMorikawa::saveMemoryLog();
 #endif
     free(param);
@@ -72,7 +72,7 @@ void operator delete(void* param)
 
 void operator delete[](void* param)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     tst::TSTMorikawa::saveMemoryLog();
 #endif
     free(param);

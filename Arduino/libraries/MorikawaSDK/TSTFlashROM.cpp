@@ -49,11 +49,19 @@
 
 namespace tst {
 
+#if defined(TARGET_INVADER_FM1) || defined(TARGET_DESPATCH_FM1)
 #define ADDRESS_LIMIT       (0x100000UL)
 #define SECTOR_LIMIT        (16)
 #define SECTOR_SIZE         (static_cast<unsigned long>(PAGE_LIMIT) * PAGE_SIZE)
 #define PAGE_LIMIT          (256)
 #define PAGE_SIZE           (256)
+#else
+#define ADDRESS_LIMIT       (0)
+#define SECTOR_LIMIT        (0)
+#define SECTOR_SIZE         (0)
+#define PAGE_LIMIT          (0)
+#define PAGE_SIZE           (0)
+#endif
 #define PAGE_PER_EEPROM     (4)
 #define POWERUP_DELAY       (40)
 #define POWERDOWN_DELAY     (4)
@@ -85,45 +93,33 @@ enum PageEnum {
 
 /*public static */unsigned long TSTFlashROM::getSize(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
-#ifdef TARGET_MORIKAWA_FM1
     return ADDRESS_LIMIT;
-#else
-    return 0;
-#endif
 }
 
 /*public static */unsigned int TSTFlashROM::getPageSize(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
-#ifdef TARGET_MORIKAWA_FM1
     return PAGE_SIZE;
-#else
-    return 0;
-#endif
 }
 
 /*public static */unsigned long TSTFlashROM::getSectorSize(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
-#ifdef TARGET_MORIKAWA_FM1
     return SECTOR_SIZE;
-#else
-    return 0;
-#endif
 }
 
 /*public */TSTError TSTFlashROM::setEraseMode(bool param)
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -139,7 +135,7 @@ enum PageEnum {
 {
     bool result(false);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -152,10 +148,10 @@ enum PageEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
-#ifdef TARGET_MORIKAWA_FM1
+#if defined(TARGET_INVADER_FM1) || defined(TARGET_DESPATCH_FM1)
     if (morikawa != NULL) {
         if (_morikawa == NULL) {
             _morikawa = morikawa;
@@ -177,7 +173,7 @@ enum PageEnum {
 
 /*public */void TSTFlashROM::cleanup(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (_morikawa != NULL) {
@@ -191,7 +187,7 @@ enum PageEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = check(address, data, &size, result)) == TSTERROR_OK) {
@@ -204,7 +200,7 @@ enum PageEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = check(address, data, &size, result)) == TSTERROR_OK) {
@@ -217,7 +213,7 @@ enum PageEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if ((error = check(address, data, &size, result)) == TSTERROR_OK) {
@@ -230,10 +226,9 @@ enum PageEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
-#ifdef TARGET_MORIKAWA_FM1
     if (_morikawa != NULL) {
         if (!_morikawa->hasAbnormalShutdown()) {
             if ((error = fillFormat(0x00)) == TSTERROR_OK) {
@@ -251,15 +246,12 @@ enum PageEnum {
     else {
         error = TSTERROR_INVALID_STATE;
     }
-#else
-    error = TSTERROR_NO_SUPPORT;
-#endif
     return error;
 }
 
 /*private static */void TSTFlashROM::open(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     pinMode(PIN_FLASHROM_CS, OUTPUT);
@@ -272,7 +264,7 @@ enum PageEnum {
 
 /*private static */void TSTFlashROM::close(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     executeCommand(COMMAND_PWDW);
@@ -285,7 +277,7 @@ enum PageEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (data != NULL) {
@@ -336,7 +328,7 @@ enum PageEnum {
     register unsigned int i;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (size > 0) {
@@ -422,7 +414,7 @@ enum PageEnum {
 {
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (size > 0) {
@@ -446,7 +438,7 @@ enum PageEnum {
     register unsigned char flag;
     register unsigned int i;
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     while (readStatus() & STATUS_WIP);
@@ -471,7 +463,7 @@ enum PageEnum {
     register unsigned int i;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     for (i = 0; i < SECTOR_LIMIT * PAGE_LIMIT; ++i) {
@@ -497,7 +489,7 @@ enum PageEnum {
     register unsigned int k;
     TSTError error(TSTERROR_OK);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     while (readStatus() & STATUS_WIP);
@@ -532,7 +524,7 @@ enum PageEnum {
 
 /*private static */void TSTFlashROM::executeCommand(unsigned char command)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     beginTransfer(command);
@@ -544,7 +536,7 @@ enum PageEnum {
 {
     unsigned char result(0);
     
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     beginTransfer(COMMAND_RDSR);
@@ -555,7 +547,7 @@ enum PageEnum {
 
 /*private static */void TSTFlashROM::beginTransfer(unsigned char command)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     digitalWrite(PIN_FLASHROM_CS, LOW);
@@ -565,7 +557,7 @@ enum PageEnum {
 
 /*private static */void TSTFlashROM::endTransfer(void)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     digitalWrite(PIN_FLASHROM_CS, HIGH);
@@ -575,7 +567,7 @@ enum PageEnum {
 
 /*private static */void TSTFlashROM::transferAddress(unsigned long address)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     SPI.transfer((address >> 16) & 0x0F);
@@ -586,7 +578,7 @@ enum PageEnum {
 
 /*private static */void TSTFlashROM::transferValue(register unsigned char value, register unsigned int size)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     for (; size > 0; --size) {
@@ -597,7 +589,7 @@ enum PageEnum {
 
 /*private static */void TSTFlashROM::transferData(register unsigned char const** ram, register unsigned char const PROGMEM** rom, register unsigned int size)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     if (*ram != NULL) {
@@ -615,7 +607,7 @@ enum PageEnum {
 
 /*private static */void TSTFlashROM::writeEEPROM(unsigned int address, unsigned char data)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     EEPROM.write(address + EEPROM_FLASHROM, data);
@@ -624,7 +616,7 @@ enum PageEnum {
 
 /*private static */unsigned char TSTFlashROM::readEEPROM(unsigned int address)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     return EEPROM.read(address + EEPROM_FLASHROM);
@@ -632,7 +624,7 @@ enum PageEnum {
 
 /*private static */void TSTFlashROM::andEEPROM(unsigned int address, unsigned char data)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     EEPROM.write(address + EEPROM_FLASHROM, EEPROM.read(address + EEPROM_FLASHROM) & data);
@@ -641,7 +633,7 @@ enum PageEnum {
 
 /*private static */void TSTFlashROM::orEEPROM(unsigned int address, unsigned char data)
 {
-#ifdef OPTION_BUILD_MEMORYLOG
+#if defined(OPTION_BUILD_MEMORYLOG)
     TSTMorikawa::saveMemoryLog();
 #endif
     EEPROM.write(address + EEPROM_FLASHROM, EEPROM.read(address + EEPROM_FLASHROM) | data);
