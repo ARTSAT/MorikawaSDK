@@ -136,6 +136,13 @@ enum MagnetEnum {
     MAGNET_LIMIT
 };
 typedef unsigned char       MagnetType;
+enum PowerBusEnum {
+    POWER_BUS_X,
+    POWER_BUS_Y,
+    POWER_BUS_Z,
+    POWER_BUS_LIMIT
+};
+typedef unsigned char       PowerBusType;
 
 struct MemorySpec {
     void const*             ram_start;
@@ -386,6 +393,8 @@ class TSTMorikawa {
                 TSTError            snapshotCamera              (CameraType mode, StorageType storage, unsigned long address, unsigned long size, unsigned long* result);
                 TSTError            freezeFastLZ                (StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, StorageType wstorage, unsigned long waddress, unsigned long wsize, unsigned long* result);
                 TSTError            meltFastLZ                  (StorageType istorage, unsigned long iaddress, unsigned long isize, StorageType ostorage, unsigned long oaddress, unsigned long osize, unsigned long* result);
+                TSTError            enablePowerBus              (PowerBusType index);
+                void                disablePowerBus             (PowerBusType index);
                 TSTError            enableAudioBus              (void);
                 void                disableAudioBus             (void);
     private:

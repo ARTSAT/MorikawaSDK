@@ -74,6 +74,7 @@ namespace tst {
 #define TIMER_INTERVAL      (80000UL)
 #define BOOT_DELAY          (1000)
 #define SHUTDOWN_DELAY      (1000)
+#define POWERBUS_DELAY      (10)
 #define AUDIOBUS_DELAY      (1000)
 #define PACKET_SEPARATOR    ('-')
 #define PACKET_REQUEST      ('c')
@@ -94,6 +95,11 @@ namespace tst {
 #define COMMAND_AUDIOBUSON  (PSTR("don"))
 #define COMMAND_AUDIOBUSOFF (PSTR("dof"))
 
+static PowerBusType const g_pin[POWER_BUS_LIMIT] PROGMEM = {
+    PIN_POWER_X,
+    PIN_POWER_Y,
+    PIN_POWER_Z
+};
 static char const g_send[] PROGMEM = PACKET_SEND;
 static char const g_receive[] PROGMEM = PACKET_RECEIVE;
 static char const g_delimiter[] PROGMEM = PACKET_DELIMITER;
@@ -530,6 +536,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 #if defined(TARGET_DESPATCH_FM1)
         digitalWrite(PIN_POWER_X, HIGH);
 #endif
+        delay(POWERBUS_DELAY);
         initializeI2C();
         initializeSPI();
         if ((log = _shared.setup(this)) != TSTERROR_OK) {
@@ -586,6 +593,10 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
         _flash.cleanup();
         _fram.cleanup();
         _shared.cleanup();
+        digitalWrite(PIN_POWER_Z, LOW);
+        digitalWrite(PIN_POWER_Y, LOW);
+        digitalWrite(PIN_POWER_X, LOW);
+        delay(POWERBUS_DELAY);
         _state = false;
     }
     return;
@@ -754,6 +765,42 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
         }
     }
     return error;
+}
+
+/*public */TSTError TSTMorikawa::enablePowerBus(PowerBusType index)
+{
+    TSTError error(TSTERROR_OK);
+    
+#if defined(OPTION_BUILD_MEMORYLOG)
+    TSTMorikawa::saveMemoryLog();
+#endif
+    if (0 <= index && index < POWER_BUS_LIMIT) {
+        if (_state) {
+            digitalWrite(pgm_read_byte(&g_pin[index]), HIGH);
+            delay(POWERBUS_DELAY);
+        }
+        else {
+            error = TSTERROR_INVALID_STATE;
+        }
+    }
+    else {
+        error = TSTERROR_INVALID_PARAM;
+    }
+    return error;
+}
+
+/*public */void TSTMorikawa::disablePowerBus(PowerBusType index)
+{
+#if defined(OPTION_BUILD_MEMORYLOG)
+    TSTMorikawa::saveMemoryLog();
+#endif
+    if (0 <= index && index < POWER_BUS_LIMIT) {
+        if (_state) {
+            digitalWrite(pgm_read_byte(&g_pin[index]), LOW);
+            delay(POWERBUS_DELAY);
+        }
+    }
+    return;
 }
 
 /*public */TSTError TSTMorikawa::enableAudioBus(void)
