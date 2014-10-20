@@ -74,7 +74,7 @@ namespace tst {
 #define TIMER_INTERVAL      (80000UL)
 #define BOOT_DELAY          (1000)
 #define SHUTDOWN_DELAY      (1000)
-#define POWERBUS_DELAY      (10)
+#define POWERBUS_DELAY      (100)
 #define AUDIOBUS_DELAY      (1000)
 #define PACKET_SEPARATOR    ('-')
 #define PACKET_REQUEST      ('c')
@@ -564,10 +564,12 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
         if ((log = _camera.setup(this)) != TSTERROR_OK) {
             writeSelfTestLog(offsetof(SelfTestLog, setup_camera), &log, sizeof(log));
         }
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
         Serial1.begin(MISSION_MAIN_BAUD);
         disableAudioBus();
         Timer1.initialize(TIMER_INTERVAL);
         Timer1.attachInterrupt(&onTimer);
+#endif
         delay(BOOT_DELAY);
     }
     else {
@@ -583,9 +585,11 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 #endif
     if (_state) {
         shareSelfTestLog();
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
         Timer1.stop();
         disableAudioBus();
         Serial1.end();
+#endif
         _camera.cleanup();
         _digitalker.cleanup();
         _tone.cleanup();
@@ -610,6 +614,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     saveMemoryLog();
 #endif
     getInstance().cleanup();
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
     Serial1.begin(MISSION_MAIN_BAUD);
     if ((log = sendRequest(PACKET_MAIN, COMMAND_AUDIOBUSOFF)) != TSTERROR_OK) {
         writeSelfTestLog(offsetof(SelfTestLog, shutdown_audiobusoff), &log, sizeof(log));
@@ -618,6 +623,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
         writeSelfTestLog(offsetof(SelfTestLog, shutdown_normalsd), &log, sizeof(log));
     }
     Serial1.end();
+#endif
     delay(SHUTDOWN_DELAY);
     while (true) {
         set_sleep_mode(SLEEP_MODE_PWR_DOWN);
@@ -811,6 +817,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 #if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
     if (_state) {
         if (!_audio) {
             if ((log = sendRequest(PACKET_MAIN, COMMAND_AUDIOBUSON)) == TSTERROR_OK) {
@@ -825,6 +832,9 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
     else {
         error = TSTERROR_INVALID_STATE;
     }
+#else
+    error = TSTERROR_NO_SUPPORT;
+#endif
     return error;
 }
 
@@ -835,6 +845,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
 #if defined(OPTION_BUILD_MEMORYLOG)
     saveMemoryLog();
 #endif
+#if defined(TARGET_INVADER_EM1) || defined(TARGET_INVADER_FM1)
     if (_state) {
         if (_audio) {
             if ((log = sendRequest(PACKET_MAIN, COMMAND_AUDIOBUSOFF)) == TSTERROR_OK) {
@@ -846,6 +857,7 @@ TSTTrinity<bool> TSTMorikawa::_selftest(false);
             }
         }
     }
+#endif
     return;
 }
 
