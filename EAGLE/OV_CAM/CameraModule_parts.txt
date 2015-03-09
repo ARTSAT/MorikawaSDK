@@ -1,0 +1,14 @@
+カメラモジュール部品情報
+
+FFCケーブルの仕様
+aitendo  http://www.aitendo.com/page/35
+
+購入品
+FFCケーブル(各種)　\480　http://www.aitendo.com/product/7256
+　
+16極　0.5mmピッチ　全長16cm　逆面導体露出タイプ　を指定
+
+カメラモジュール
+
+OV7670　(刻印がHDF 70-818)
+　http://www.aitendo.com/product/2508
