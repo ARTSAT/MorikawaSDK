@@ -9,9 +9,9 @@ mega2560v.upload.protocol=stk500v2
 mega2560v.upload.maximum_size=258048
 mega2560v.upload.speed=57600
 
-mega2560v.bootloader.low_fuses=0xE2
+mega2560v.bootloader.low_fuses=0xFF
 mega2560v.bootloader.high_fuses=0xD4
-mega2560v.bootloader.extended_fuses=0xFD
+mega2560v.bootloader.extended_fuses=0xFE
 mega2560v.bootloader.path=
 mega2560v.bootloader.file=MegaPro3.3V-8MHz-57600.hex
 mega2560v.bootloader.lock_bits=0xCF	
